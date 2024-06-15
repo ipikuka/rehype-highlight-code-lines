@@ -3,7 +3,7 @@
 [![NPM version][badge-npm-version]][npm-package-url]
 [![NPM downloads][badge-npm-download]][npm-package-url]
 [![Build][badge-build]][github-workflow-url]
-[![codecov](https://codecov.io/gh/ipikuka/rehype-highlight-lines/graph/badge.svg?token=o3TGkL4yUV)](https://codecov.io/gh/ipikuka/rehype-highlight-lines)
+[![codecov](https://codecov.io/gh/ipikuka/rehype-highlight-lines/graph/badge.svg?token=RKrZlvMHwq)](https://codecov.io/gh/ipikuka/rehype-highlight-lines)
 [![type-coverage](https://img.shields.io/badge/dynamic/json.svg?label=type-coverage&prefix=%E2%89%A5&suffix=%&query=$.typeCoverage.atLeast&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fipikuka%2Frehype-highlight-lines%2Fmaster%2Fpackage.json)](https://github.com/ipikuka/rehype-highlight-lines)
 [![typescript][badge-typescript]][typescript-url]
 [![License][badge-license]][github-license-url]
@@ -22,6 +22,7 @@ The `rehype-highlight-lines` is useful if you want to add line numbers to code b
 
 > [!IMPORTANT]
 > If the code highlighter already provides numbering and highlighting code lines, don't use `rehype-highlight-lines`!
+> \
 > \
 > You can use `rehype-highlight-lines` even without a code highlighter.
 
@@ -45,17 +46,23 @@ In a code fence, just after the language of the code block,
 + specify a range of number in curly braces in order to highlight desired code lines,
 + and/or add `showLineNumbers` in order to add numbering to code lines.
 
-**```[language] {2,4-6} showLineNumbers**
-**```[language] showLineNumbers {2}**
-**```[language] {1-3}**
-**```[language] showLineNumbers**
+**[language] {2,4-6} showLineNumbers**
+
+**[language] showLineNumbers {2}**
+
+**[language] {1-3}**
+
+**[language] showLineNumbers**
 
 You can use the specifiers without a language.
 
-**```{5} showLineNumbers**
-**```showLineNumbers {5}**
-**```{2,3}**
-**```showLineNumbers**
+**{5} showLineNumbers**
+
+**showLineNumbers {5}**
+
+**{2,3}**
+
+**showLineNumbers**
 
 Say we have the following markdown file, `example.md`:
 
