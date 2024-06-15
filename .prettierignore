@@ -1,0 +1,8 @@
+.DS_Store
+.vscode
+dist
+node_modules
+coverage
+package-lock.json
+archive
+README.md
