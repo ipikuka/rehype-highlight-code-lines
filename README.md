@@ -1,10 +1,10 @@
-# rehype-highlight-lines
+# rehype-highlight-code-lines
 
 [![NPM version][badge-npm-version]][npm-package-url]
 [![NPM downloads][badge-npm-download]][npm-package-url]
 [![Build][badge-build]][github-workflow-url]
-[![codecov](https://codecov.io/gh/ipikuka/rehype-highlight-lines/graph/badge.svg?token=RKrZlvMHwq)](https://codecov.io/gh/ipikuka/rehype-highlight-lines)
-[![type-coverage](https://img.shields.io/badge/dynamic/json.svg?label=type-coverage&prefix=%E2%89%A5&suffix=%&query=$.typeCoverage.atLeast&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fipikuka%2Frehype-highlight-lines%2Fmaster%2Fpackage.json)](https://github.com/ipikuka/rehype-highlight-lines)
+[![codecov](https://codecov.io/gh/ipikuka/rehype-highlight-code-lines/graph/badge.svg?token=RKrZlvMHwq)](https://codecov.io/gh/ipikuka/rehype-highlight-code-lines)
+[![type-coverage](https://img.shields.io/badge/dynamic/json.svg?label=type-coverage&prefix=%E2%89%A5&suffix=%&query=$.typeCoverage.atLeast&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fipikuka%2Frehype-highlight-code-lines%2Fmaster%2Fpackage.json)](https://github.com/ipikuka/rehype-highlight-code-lines)
 [![typescript][badge-typescript]][typescript-url]
 [![License][badge-license]][github-license-url]
 
@@ -16,28 +16,28 @@ This package is a [unified][unified] ([rehype][rehype]) plugin **to add wrapper 
 
 ## When should I use this?
 
-The `rehype-highlight-lines` is useful if you want to add line numbers to code blocks and want to highlight desired code lines.
+The `rehype-highlight-code-lines` is useful if you want to add line numbers to code blocks and want to highlight desired code lines.
 
-**The `rehype-highlight-lines` is NOT code highlighter and does NOT provide code highlighting!** You can use a code highlighter for example **[rehype-highlight][rehype-highlight]** to highlight the code, then use the `rehype-highlight-lines` **after**. 
+**The `rehype-highlight-code-lines` is NOT code highlighter and does NOT provide code highlighting!** You can use a code highlighter for example **[rehype-highlight][rehype-highlight]** to highlight the code, then use the `rehype-highlight-code-lines` **after**. 
 
 > [!IMPORTANT]
-> If the code highlighter already provides numbering and highlighting code lines, don't use `rehype-highlight-lines`!
+> If the code highlighter already provides numbering and highlighting code lines, don't use `rehype-highlight-code-lines`!
 > \
 > \
-> You can use `rehype-highlight-lines` even without a code highlighter.
+> You can use `rehype-highlight-code-lines` even without a code highlighter.
 
 ## Installation
 
 This package is suitable for ESM only. In Node.js (version 16+), install with npm:
 
 ```bash
-npm install rehype-highlight-lines
+npm install rehype-highlight-code-lines
 ```
 
 or
 
 ```bash
-yarn add rehype-highlight-lines
+yarn add rehype-highlight-code-lines
 ```
 
 ## Usage
@@ -46,23 +46,23 @@ In a code fence, just after the language of the code block,
 + specify a range of number in curly braces in order to highlight desired code lines,
 + and/or add `showLineNumbers` in order to add numbering to code lines.
 
-**[language] {2,4-6} showLineNumbers**
+**\`\`\`[language] {2,4-6} showLineNumbers**
 
-**[language] showLineNumbers {2}**
+**\`\`\`[language] showLineNumbers {2}**
 
-**[language] {1-3}**
+**\`\`\`[language] {1-3}**
 
-**[language] showLineNumbers**
+**\`\`\`[language] showLineNumbers**
 
 You can use the specifiers without a language.
 
-**{5} showLineNumbers**
+**\`\`\`{5} showLineNumbers**
 
-**showLineNumbers {5}**
+**\`\`\`showLineNumbers {5}**
 
-**{2,3}**
+**\`\`\`{2,3}**
 
-**showLineNumbers**
+**\`\`\`showLineNumbers**
 
 Say we have the following markdown file, `example.md`:
 
@@ -82,7 +82,7 @@ import remark from "remark";
 import gfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
 import rehypeHighlight from "rehype-highlight";
-import rehypeHighlightLines from "rehype-highlight-lines";
+import rehypeHighlightLines from "rehype-highlight-code-lines";
 import rehypeStringify from "rehype-stringify";
 
 main();
@@ -119,7 +119,7 @@ Now, running `node example.js` you will see that each line of code is wrapped in
 </pre>
 ```
 
-Without `rehype-highlight-lines`, the lines of code wouldn't be in a `div`.
+Without `rehype-highlight-code-lines`, the lines of code wouldn't be in a `div`.
 
 ```html
 <pre>
@@ -168,7 +168,7 @@ This plugin works with `rehype-parse` version 1+, `rehype-stringify` version 1+,
 
 ## Security
 
-Use of `rehype-highlight-lines` involves rehype (hast), but doesn't lead to cross-site scripting (XSS) attacks.
+Use of `rehype-highlight-code-lines` involves rehype (hast), but doesn't lead to cross-site scripting (XSS) attacks.
 
 ## My Plugins
 
@@ -195,7 +195,7 @@ I like to contribute the Unified / Remark / MDX ecosystem, so I recommend you to
 
 - [`rehype-pre-language`](https://www.npmjs.com/package/rehype-pre-language)
   – Rehype plugin to add language information as a property to `pre` element
-- [`rehype-highlight-lines`](https://www.npmjs.com/package/rehype-highlight-lines)
+- [`rehype-highlight-code-lines`](https://www.npmjs.com/package/rehype-highlight-code-lines)
   – Rehype plugin to add line numbers to code blocks and allow highlighting of desired code lines
 
 ### My Recma Plugins
@@ -218,7 +218,7 @@ I like to contribute the Unified / Remark / MDX ecosystem, so I recommend you to
 [rehypepluginnpm]: https://www.npmjs.com/search?q=keywords:rehype%20plugin
 [hastnpm]: https://www.npmjs.com/search?q=keywords:hast
 [markdownnpm]: https://www.npmjs.com/search?q=keywords:markdown
-rehypehighlightnpm: https://www.npmjs.com/search?q=keywords:rehype-highlight
+[rehypehighlightnpm]: https://www.npmjs.com/search?q=keywords:rehype-highlight
 
 [unified]: https://github.com/unifiedjs/unified
 [micromark]: https://github.com/micromark/micromark
@@ -231,15 +231,15 @@ rehypehighlightnpm: https://www.npmjs.com/search?q=keywords:rehype-highlight
 [typescript]: https://www.typescriptlang.org/
 [rehype-highlight]: https://github.com/rehypejs/rehype-highlight
 
-[badge-npm-version]: https://img.shields.io/npm/v/rehype-highlight-lines
-[badge-npm-download]:https://img.shields.io/npm/dt/rehype-highlight-lines
-[npm-package-url]: https://www.npmjs.com/package/rehype-highlight-lines
+[badge-npm-version]: https://img.shields.io/npm/v/rehype-highlight-code-lines
+[badge-npm-download]:https://img.shields.io/npm/dt/rehype-highlight-code-lines
+[npm-package-url]: https://www.npmjs.com/package/rehype-highlight-code-lines
 
-[badge-license]: https://img.shields.io/github/license/ipikuka/rehype-highlight-lines
-[github-license-url]: https://github.com/ipikuka/rehype-highlight-lines/blob/main/LICENSE
+[badge-license]: https://img.shields.io/github/license/ipikuka/rehype-highlight-code-lines
+[github-license-url]: https://github.com/ipikuka/rehype-highlight-code-lines/blob/main/LICENSE
 
-[badge-build]: https://github.com/ipikuka/rehype-highlight-lines/actions/workflows/publish.yml/badge.svg
-[github-workflow-url]: https://github.com/ipikuka/rehype-highlight-lines/actions/workflows/publish.yml
+[badge-build]: https://github.com/ipikuka/rehype-highlight-code-lines/actions/workflows/publish.yml/badge.svg
+[github-workflow-url]: https://github.com/ipikuka/rehype-highlight-code-lines/actions/workflows/publish.yml
 
-[badge-typescript]: https://img.shields.io/npm/types/rehype-highlight-lines
+[badge-typescript]: https://img.shields.io/npm/types/rehype-highlight-code-lines
 [typescript-url]: https://www.typescriptlang.org/

@@ -1,5 +1,5 @@
 {
-  "name": "rehype-highlight-lines",
+  "name": "rehype-highlight-code-lines",
   "version": "0.0.1",
   "description": "Rehype plugin to add line numbers to code blocks and allow highlighting of desired code lines",
   "type": "module",
@@ -26,7 +26,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ipikuka/rehype-highlight-lines.git"
+    "url": "git+https://github.com/ipikuka/rehype-highlight-code-lines.git"
   },
   "keywords": [
     "unified",
@@ -41,9 +41,9 @@
   ],
   "author": "ipikuka <talatkuyuk@gmail.com>",
   "license": "MIT",
-  "homepage": "https://github.com/ipikuka/rehype-highlight-lines#readme",
+  "homepage": "https://github.com/ipikuka/rehype-highlight-code-lines#readme",
   "bugs": {
-    "url": "https://github.com/ipikuka/rehype-highlight-lines/issues"
+    "url": "https://github.com/ipikuka/rehype-highlight-code-lines/issues"
   },
   "devDependencies": {
     "@types/dedent": "^0.7.2",
