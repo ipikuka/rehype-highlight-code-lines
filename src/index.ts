@@ -3,13 +3,25 @@ import type { Root, Element, ElementContent, ElementData } from "hast";
 import { type VisitorResult, visit, CONTINUE } from "unist-util-visit";
 import rangeParser from "parse-numeric-range";
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+type Prettify<T> = { [K in keyof T]: T[K] } & {};
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+type PartiallyRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
+
 export type HighlightLinesOptions = {
   showLineNumbers?: boolean;
+  lineContainerTagName?: "div" | "span";
 };
 
 const DEFAULT_SETTINGS: HighlightLinesOptions = {
   showLineNumbers: false,
+  lineContainerTagName: "span",
 };
+
+type PartiallyRequiredHighlightLinesOptions = Prettify<
+  PartiallyRequired<HighlightLinesOptions, "showLineNumbers" | "lineContainerTagName">
+>;
 
 type CodeData = ElementData & {
   meta?: string;
@@ -26,7 +38,39 @@ export function clsx(arr: (string | false | null | undefined | 0)[]): string[] {
  *
  */
 const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
-  const settings = Object.assign({}, DEFAULT_SETTINGS, options);
+  const settings = Object.assign(
+    {},
+    DEFAULT_SETTINGS,
+    options,
+  ) as PartiallyRequiredHighlightLinesOptions;
+
+  /**
+   *
+   * flatten deep nodes
+   *
+   */
+  function flattenCodeTree(
+    children: ElementContent[],
+    className: string[] = [],
+    newTree: ElementContent[] = [],
+  ): ElementContent[] {
+    for (let i = 0; i < children.length; i++) {
+      const node = children[i];
+      console.log(node);
+      if (node.type !== "element") {
+        newTree = newTree.concat([node]);
+      } else if (node.children.length === 1 && node.children[0].type !== "element") {
+        // @ts-expect-error
+        node.properties.className = className.concat(node.properties.className);
+        newTree = newTree.concat([node]);
+      } else {
+        // @ts-expect-error
+        const classNames = className.concat(node.properties?.className || []);
+        newTree = newTree.concat(flattenCodeTree(node.children, classNames));
+      }
+    }
+    return newTree;
+  }
 
   /**
    *
@@ -35,16 +79,21 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
    */
   const createLine = (
     children: ElementContent[],
-    lineNumber: number | undefined,
-    classNames: string[],
+    lineNumber: number,
+    showLineNumbers: boolean,
+    linesToBeHighlighted: number[],
   ): Element => {
     return {
       type: "element",
-      tagName: "div",
+      tagName: settings.lineContainerTagName,
       children,
       properties: {
-        className: classNames,
-        ...(lineNumber && { "data-line-number": lineNumber }),
+        className: clsx([
+          "code-line",
+          showLineNumbers && "numbered-code-line",
+          linesToBeHighlighted.includes(lineNumber) && "highlighted-code-line",
+        ]),
+        dataLineNumber: showLineNumbers ? lineNumber : undefined,
       },
     };
   };
@@ -52,12 +101,9 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
   // match all common types of line breaks
   const RE = /\r?\n|\r/g;
 
-  function starryNightGutter(
-    tree: Element,
-    showLineNumbers: boolean,
-    linesToBeHighlighted: number[],
-  ) {
+  function gutter(tree: Element, showLineNumbers: boolean, linesToBeHighlighted: number[]) {
     const replacement: Array<ElementContent> = [];
+
     let index = -1;
     let start = 0;
     let startTextRemainder = "";
@@ -71,7 +117,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
         let match = RE.exec(child.value);
 
         while (match) {
-          // Nodes in this line.
+          // Nodes in this line. (current child is exclusive)
           const line = tree.children.slice(start, index);
 
           /* v8 ignore start */
@@ -86,29 +132,18 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
           // Append text from this text.
           if (match.index > textStart) {
-            line.push({
-              type: "text",
-              value: child.value.slice(textStart, match.index),
-            });
+            const value = child.value.slice(textStart, match.index);
+            line.push({ type: "text", value });
           }
 
-          // Add a line, and the eol.
+          // Add a line
           lineNumber += 1;
-          replacement.push(
-            createLine(
-              line,
-              showLineNumbers ? lineNumber : undefined,
-              clsx([
-                "code-line",
-                showLineNumbers && "numbered-code-line",
-                linesToBeHighlighted.includes(lineNumber) && "highlighted-code-line",
-              ]),
-            ),
-            {
-              type: "text",
-              value: match[0],
-            },
-          );
+          replacement.push(createLine(line, lineNumber, showLineNumbers, linesToBeHighlighted));
+
+          // Add eol if the tag name is "span"
+          if (settings.lineContainerTagName === "span") {
+            replacement.push({ type: "text", value: match[0] });
+          }
 
           start = index + 1;
           textStart = match.index + match[0].length;
@@ -134,17 +169,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
     if (line.length > 0) {
       lineNumber += 1;
-      replacement.push(
-        createLine(
-          line,
-          showLineNumbers ? lineNumber : undefined,
-          clsx([
-            "code-line",
-            showLineNumbers && "numbered-code-line",
-            linesToBeHighlighted.includes(lineNumber) && "highlighted-code-line",
-          ]),
-        ),
-      );
+      replacement.push(createLine(line, lineNumber, showLineNumbers, linesToBeHighlighted));
     }
 
     /* v8 ignore end */
@@ -188,10 +213,10 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
           if (language.startsWith("{") || language.startsWith("showlinenumbers")) {
             meta = meta ? language + meta : language;
 
-            const index = code.properties.className.findIndex(testingFunction);
+            const idx = code.properties.className.findIndex(testingFunction);
 
-            if (index > -1) {
-              code.properties.className[index] = "language-unknown";
+            if (idx > -1) {
+              code.properties.className[idx] = "language-unknown";
             }
           }
         }
@@ -208,8 +233,11 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
       if (!showLineNumbers && linesToBeHighlighted.length === 0) return;
 
+      // flatten deeper nodes into first level <span>s an texts
+      code.children = flattenCodeTree(code.children);
+
       // add wrapper for each line mutating the code element
-      starryNightGutter(code, showLineNumbers, linesToBeHighlighted);
+      gutter(code, showLineNumbers, linesToBeHighlighted);
     });
   };
 };

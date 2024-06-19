@@ -8,7 +8,7 @@
 [![typescript][badge-typescript]][typescript-url]
 [![License][badge-license]][github-license-url]
 
-This package is a [unified][unified] ([rehype][rehype]) plugin **to add wrapper to each line in a code block, allowing numbering of the code block and highlighting desired lines of code**.
+This package is a [unified][unified] ([rehype][rehype]) plugin **to add container to each line in a code block, allowing numbering of the code block and highlighting desired lines of code**.
 
 **[unified][unified]** is a project that transforms content with abstract syntax trees (ASTs) using the new parser **[micromark][micromark]**. **[remark][remark]** adds support for markdown to unified. **[mdast][mdast]** is the Markdown Abstract Syntax Tree (AST) which is a specification for representing markdown in a syntax tree. "**[rehype][rehype]**" is a tool that transforms HTML with plugins. "**[hast][hast]**" stands for HTML Abstract Syntax Tree (HAST) that rehype uses.
 
@@ -131,17 +131,48 @@ Without `rehype-highlight-code-lines`, the lines of code wouldn't be in a `div`.
 </pre>
 ```
 
+***Note:** `hljs` prefix comes from `rehype-highlight`*.
+
 ## Options
 
-There is one **boolean** option. 
+All options are **optional** and have **default values**.
 
 ```typescript
 type HighlightLinesOptions = {
-  showLineNumbers?: boolean; // the default is "false"
+  showLineNumbers?: boolean; // default is "false"
+  lineContainerTagName?: "div" | "span"; // default is "span"
 };
 
 use(rehypeHighlightLines, HighlightLinesOptions);
 ```
+
+#### `showLineNumbers`
+
+It is a **boolean** option which is for all code blocks will be numbered.
+
+By default, it is `false`.
+
+```javascript
+use(rehypeHighlightLines, {
+  showLineNumbers: true,
+});
+```
+
+Now, all code blocks will become numbered by line.
+
+#### `lineContainerTagName`
+
+It is a **union** type option which is **"div" | "span"** for providing custom HTML tag name for code lines.
+
+By default, it is `span` which is **inline** level container. If you set it as `div`, the container will be **block** level, in perspective of CSS.
+
+```javascript
+use(rehypeHighlightLines, {
+  lineContainerTagName: "div",
+});
+```
+
+Now, the code line container's tag name will be `div`.
 
 ### Examples:
 
