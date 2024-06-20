@@ -47,9 +47,9 @@
   },
   "devDependencies": {
     "@types/dedent": "^0.7.2",
-    "@types/node": "^20.14.2",
-    "@typescript-eslint/eslint-plugin": "^7.13.0",
-    "@typescript-eslint/parser": "^7.13.0",
+    "@types/node": "^20.14.6",
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/parser": "^7.13.1",
     "@vitest/coverage-v8": "^1.6.0",
     "dedent": "^1.5.3",
     "eslint": "^8.57.0",
@@ -63,8 +63,8 @@
     "remark-rehype": "^11.1.0",
     "rimraf": "^5.0.7",
     "type-coverage": "^2.29.0",
-    "typescript": "^5.4.5",
-    "unified": "^11.0.4",
+    "typescript": "^5.5.2",
+    "unified": "^11.0.5",
     "vfile": "^6.0.1",
     "vitest": "^1.4.0"
   },

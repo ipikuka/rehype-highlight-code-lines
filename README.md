@@ -148,7 +148,7 @@ use(rehypeHighlightLines, HighlightLinesOptions);
 
 #### `showLineNumbers`
 
-It is a **boolean** option which is for all code blocks will be numbered.
+It is a **boolean** option which is for all code to be numbered.
 
 By default, it is `false`.
 
@@ -158,7 +158,7 @@ use(rehypeHighlightLines, {
 });
 ```
 
-Now, all code blocks will become numbered by line. If you want to exclude a specific code block not to be numbered, use `noLineNumbers`.
+Now, all code blocks will become numbered. If you want to exclude a specific code block not to be numbered, use `noLineNumbers`.
 
 **\`\`\`[language] noLineNumbers {2}**
 
@@ -203,9 +203,9 @@ use(rehypeHighlightLines, {
 
 ## Copying Code Block's Content Issue
 
-When the line containers are "div" block element, the end of line character (eol) at the end of each line causes unwanted extra blank lines. In order to fix the issue, I've removed the eol when they are "div", but kept it when they are "span".
+When the line container is "div" block element, the end of line character (eol) at the end of line causes unwanted extra blank line. In order to fix the issue, I've **removed the eol when it is "div", but kept the eol when it is "span"**.
 
-But, the lack of eol when "div" causes another issue. If you implement a button for copying code block content, it doesn't work as expected as all code are printed in a single line. In order to work around the issue, you can implement an `onClick` like below:
+But, **the lack of the eol when "div" causes another issue.** If you implement a button for copying code block content, it doesn't work as expected since all code are printed in a single line. In order to work around the issue, you can implement an `onClick` of the `button` like below:
 
 *I assume you use a `useRef` for `<pre>` element.*
 
