@@ -158,7 +158,13 @@ use(rehypeHighlightLines, {
 });
 ```
 
-Now, all code blocks will become numbered by line.
+Now, all code blocks will become numbered by line. If you want to exclude a specific code block not to be numbered, use `noLineNumbers`.
+
+**\`\`\`[language] noLineNumbers {2}**
+
+**\`\`\`[language] noLineNumbers**
+
+**\`\`\`noLineNumbers**
 
 #### `lineContainerTagName`
 

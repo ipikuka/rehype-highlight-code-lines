@@ -212,7 +212,11 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
         if (className) {
           const language = className.slice(9).toLowerCase();
 
-          if (language.startsWith("{") || language.startsWith("showlinenumbers")) {
+          if (
+            language.startsWith("{") ||
+            language.startsWith("showlinenumbers") ||
+            language.startsWith("nolinenumbers")
+          ) {
             meta = meta ? language + meta : language;
 
             const idx = code.properties.className.findIndex(testingFunction);
@@ -234,7 +238,9 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
       if (!meta) return;
 
-      const showLineNumbers = meta.includes("showlinenumbers");
+      const showLineNumbers = meta.includes("nolinenumbers")
+        ? false
+        : meta.includes("showlinenumbers");
 
       // find number range string within curly braces and parse it
       const RE = /{(?<lines>[\d\s,-]+)}/g;
