@@ -166,6 +166,14 @@ Now, all code blocks will become numbered by line. If you want to exclude a spec
 
 **\`\`\`noLineNumbers**
 
+Sometimes you may want to start the line numbering from a specific number. In that cases, use `showLineNumbers=[number]` in code blocks. For example, below, the code block's line numbering will start from number `8`.
+
+**\`\`\`[language] {2} showLineNumbers=8**
+
+**\`\`\`[language] showLineNumbers=8**
+
+**\`\`\`showLineNumbers=8**
+
 #### `lineContainerTagName`
 
 It is a **union** type option which is **"div" | "span"** for providing custom HTML tag name for code lines.
@@ -183,10 +191,122 @@ Now, the code line container's tag name will be `div`.
 ### Examples:
 
 ```typescript
+// line numbering will occur as per directive "showLineNumber" and code-line containers will be <span> inline element
 use(rehypeHighlightLines);
 
-// all code blocks will be numbered in MDX/markdown source
-use(rehypeHighlightLines, {showLineNumbers: true});
+// all code blocks will be numbered and code-line containers will be <div> block element
+use(rehypeHighlightLines, {
+  showLineNumbers: true,
+  lineContainerTagName: "div",
+});
+```
+
+## Copying Code Block's Content Issue
+
+When the line containers are "div" block element, the end of line character (eol) at the end of each line causes unwanted extra blank lines. In order to fix the issue, I've removed the eol when they are "div", but kept it when they are "span".
+
+But, the lack of eol when "div" causes another issue. If you implement a button for copying code block content, it doesn't work as expected as all code are printed in a single line. In order to work around the issue, you can implement an `onClick` like below:
+
+*I assume you use a `useRef` for `<pre>` element.*
+
+```javascript
+const onClick = () => {
+  if (!preRef.current) return;
+
+  // clone the <code> element in order not to cause any change in actual DOM
+  const code = preRef.current.getElementsByTagName("code")[0].cloneNode(true);
+
+  // add eol to each code-line since there is no eol at the end when they are div
+  Array.from((code as HTMLElement).querySelectorAll("div.code-line")).forEach(
+    (line) => {
+      line.innerHTML = line.innerHTML + "\r";
+    }
+  );
+
+  void navigator.clipboard.writeText(code.textContent ?? "");
+};
+```
+
+## Styling
+
+The following styles can be added for **line highlighting** and **line numbering** to work correctly:
+
+*Choose the colors as you wish!*
+
+```css
+.parent-container-of-pre {
+  display: grid; /* in order { overflow-x: auto; } works in child <pre> */
+}
+
+pre,
+pre code {
+  background-color: var(--color-code-background);
+
+  direction: ltr;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  line-height: 1.2;
+  tab-size: 2;
+  hyphens: none;
+}
+
+pre {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-text-weak);
+  border-radius: 5px;
+
+  overflow-x: auto;
+}
+
+pre > code {
+  float: left;
+  min-width: 100%;
+}
+
+.code-line {
+  padding-left: 12px;
+  padding-right: 12px;
+  margin-left: -12px;
+  margin-right: -12px;
+  border-left: 4px solid transparent; /* prepare for highlighted code-lines */
+}
+
+div.code-line:empty {
+  /* it is necessary because there is no even eol character in div code-lines */
+  height: 15.5938px; /* calculated height */
+}
+
+span.code-line {
+  min-width: 100%;
+  display: inline-block;
+}
+
+.code-line.inserted {
+  background-color: var(--color-inserted-line); /* inserted code-line (+) color */
+}
+
+.code-line.deleted {
+  background-color: var(--color-deleted-line); /* deleted code-line (-) color */
+}
+
+.highlighted-code-line {
+  background-color: var(--color-highlighted-line);
+  border-left: 4px solid var(--color-highlighted-line-indicator);
+}
+
+.numbered-code-line::before {
+  content: attr(data-line-number);
+
+  margin-left: -8px;
+  margin-right: 16px;
+  width: 1rem;
+  color: var(--color-text-weak);
+  text-align: right;
+
+  display: inline-block;
+}
 ```
 
 ## Syntax tree

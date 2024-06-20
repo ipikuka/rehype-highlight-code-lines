@@ -46,7 +46,8 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
   /**
    *
-   * flatten deep nodes
+   * flatten code element children
+   * inspired from https://github.com/react-syntax-highlighter/react-syntax-highlighter/blob/master/src/highlight.js
    *
    */
   function flattenCodeTree(
@@ -82,6 +83,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
   const createLine = (
     children: ElementContent[],
     lineNumber: number,
+    startingNumber: number,
     showLineNumbers: boolean,
     linesToBeHighlighted: number[],
   ): Element => {
@@ -95,7 +97,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
           showLineNumbers && "numbered-code-line",
           linesToBeHighlighted.includes(lineNumber) && "highlighted-code-line",
         ]),
-        dataLineNumber: showLineNumbers ? lineNumber : undefined,
+        dataLineNumber: showLineNumbers ? startingNumber - 1 + lineNumber : undefined,
       },
     };
   };
@@ -103,7 +105,12 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
   // match all common types of line breaks
   const RE = /\r?\n|\r/g;
 
-  function gutter(tree: Element, showLineNumbers: boolean, linesToBeHighlighted: number[]) {
+  function gutter(
+    tree: Element,
+    showLineNumbers: boolean,
+    startingNumber: number,
+    linesToBeHighlighted: number[],
+  ) {
     const replacement: Array<ElementContent> = [];
 
     let index = -1;
@@ -140,7 +147,9 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
           // Add a line
           lineNumber += 1;
-          replacement.push(createLine(line, lineNumber, showLineNumbers, linesToBeHighlighted));
+          replacement.push(
+            createLine(line, lineNumber, startingNumber, showLineNumbers, linesToBeHighlighted),
+          );
 
           // Add eol if the tag name is "span"
           if (settings.lineContainerTagName === "span") {
@@ -171,7 +180,9 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
     if (line.length > 0) {
       lineNumber += 1;
-      replacement.push(createLine(line, lineNumber, showLineNumbers, linesToBeHighlighted));
+      replacement.push(
+        createLine(line, lineNumber, startingNumber, showLineNumbers, linesToBeHighlighted),
+      );
     }
 
     /* v8 ignore end */
@@ -242,10 +253,22 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
         ? false
         : meta.includes("showlinenumbers");
 
+      let startingNumber = 1;
+
+      if (showLineNumbers) {
+        const REGEX1 = /showlinenumbers=(?<start>\d+)/i;
+        const start = REGEX1.exec(meta)?.groups?.start;
+        if (start && !isNaN(Number(start))) startingNumber = Number(start);
+      }
+
+      console.log({ startingNumber });
+
       // find number range string within curly braces and parse it
-      const RE = /{(?<lines>[\d\s,-]+)}/g;
-      const strLineNumbers = RE.exec(meta)?.groups?.lines?.replace(/\s/g, "");
+      const REGEX2 = /{(?<lines>[\d\s,-]+)}/g;
+      const strLineNumbers = REGEX2.exec(meta)?.groups?.lines?.replace(/\s/g, "");
       const linesToBeHighlighted = strLineNumbers ? rangeParser(strLineNumbers) : [];
+
+      console.log({ linesToBeHighlighted });
 
       if (!showLineNumbers && linesToBeHighlighted.length === 0) return;
 
@@ -253,7 +276,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       code.children = flattenCodeTree(code.children);
 
       // add wrapper for each line mutating the code element
-      gutter(code, showLineNumbers, linesToBeHighlighted);
+      gutter(code, showLineNumbers, startingNumber, linesToBeHighlighted);
     });
   };
 };
