@@ -1,6 +1,6 @@
 {
   "name": "rehype-highlight-code-lines",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Rehype plugin to add line numbers to code blocks and allow highlighting of desired code lines",
   "type": "module",
   "exports": "./dist/esm/index.js",
