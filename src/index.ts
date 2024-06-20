@@ -56,17 +56,19 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
   ): ElementContent[] {
     for (let i = 0; i < children.length; i++) {
       const node = children[i];
-      console.log(node);
       if (node.type !== "element") {
-        newTree = newTree.concat([node]);
-      } else if (node.children.length === 1 && node.children[0].type !== "element") {
-        // @ts-expect-error
-        node.properties.className = className.concat(node.properties.className);
         newTree = newTree.concat([node]);
       } else {
         // @ts-expect-error
+        // /* v8 ignore next */
         const classNames = className.concat(node.properties?.className || []);
-        newTree = newTree.concat(flattenCodeTree(node.children, classNames));
+
+        if (node.children.length === 1 && node.children[0].type !== "element") {
+          node.properties.className = classNames;
+          newTree = newTree.concat([node]);
+        } else {
+          newTree = newTree.concat(flattenCodeTree(node.children, classNames));
+        }
       }
     }
     return newTree;
@@ -222,9 +224,17 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
         }
       }
 
+      if (settings.showLineNumbers) {
+        if (!meta) {
+          meta = "showlinenumbers";
+        } else if (!meta.includes("showlinenumbers")) {
+          meta = meta + " showlinenumbers";
+        }
+      }
+
       if (!meta) return;
 
-      const showLineNumbers = settings.showLineNumbers || meta.includes("showlinenumbers");
+      const showLineNumbers = meta.includes("showlinenumbers");
 
       // find number range string within curly braces and parse it
       const RE = /{(?<lines>[\d\s,-]+)}/g;

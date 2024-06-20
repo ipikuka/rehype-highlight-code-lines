@@ -102,6 +102,75 @@ describe("reyhpe-pre-language", () => {
   });
 
   // ******************************************
+  it("with numbered (via settings) and highlighted lines", async () => {
+    const input = dedent`
+      \`\`\`javascript {2}
+      const a1=1;
+      const a2=2;
+      const a3=3;
+      \`\`\`
+    `;
+
+    html = String(await process(input, { showLineNumbers: true }));
+
+    expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
+      "<pre>
+        <code class="hljs language-javascript">
+          <span class="code-line numbered-code-line" data-line-number="1">
+            <span class="hljs-keyword">const</span> a1=
+            <span class="hljs-number">1</span>;
+          </span>
+          <span
+            class="code-line numbered-code-line highlighted-code-line"
+            data-line-number="2"
+          >
+            <span class="hljs-keyword">const</span> a2=
+            <span class="hljs-number">2</span>;
+          </span>
+          <span class="code-line numbered-code-line" data-line-number="3">
+            <span class="hljs-keyword">const</span> a3=
+            <span class="hljs-number">3</span>;
+          </span>
+        </code>
+      </pre>
+      "
+    `);
+  });
+
+  // ******************************************
+  it("with only language but numbered (via settings)", async () => {
+    const input = dedent`
+      \`\`\`javascript
+      const a1=1;
+      const a2=2;
+      const a3=3;
+      \`\`\`
+    `;
+
+    html = String(await process(input, { showLineNumbers: true }));
+
+    expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
+      "<pre>
+        <code class="hljs language-javascript">
+          <span class="code-line numbered-code-line" data-line-number="1">
+            <span class="hljs-keyword">const</span> a1=
+            <span class="hljs-number">1</span>;
+          </span>
+          <span class="code-line numbered-code-line" data-line-number="2">
+            <span class="hljs-keyword">const</span> a2=
+            <span class="hljs-number">2</span>;
+          </span>
+          <span class="code-line numbered-code-line" data-line-number="3">
+            <span class="hljs-keyword">const</span> a3=
+            <span class="hljs-number">3</span>;
+          </span>
+        </code>
+      </pre>
+      "
+    `);
+  });
+
+  // ******************************************
   it("with numbered and highlighted lines, tag name is div", async () => {
     const input = dedent`
       \`\`\`javascript {2} showLineNumbers
