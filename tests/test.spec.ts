@@ -422,10 +422,10 @@ describe("reyhpe-pre-language", () => {
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-diff">
-          <span class="code-line numbered-code-line" data-line-number="1">
+          <span class="code-line numbered-code-line inserted" data-line-number="1">
             <span class="hljs-addition">+ const a1=1;</span>
           </span>
-          <span class="code-line numbered-code-line" data-line-number="2">
+          <span class="code-line numbered-code-line deleted" data-line-number="2">
             <span class="hljs-deletion">- const a2=2;</span>
           </span>
         </code>

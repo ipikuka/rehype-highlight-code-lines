@@ -87,6 +87,20 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
     showLineNumbers: boolean,
     linesToBeHighlighted: number[],
   ): Element => {
+    const firstChild = children[0];
+    const isAddition =
+      firstChild.type === "element" &&
+      Array.isArray(firstChild.properties.className) &&
+      firstChild.properties.className.some(
+        (cls) => typeof cls === "string" && cls.includes("addition"),
+      );
+    const isDeletion =
+      firstChild.type === "element" &&
+      Array.isArray(firstChild.properties.className) &&
+      firstChild.properties.className.some(
+        (cls) => typeof cls === "string" && cls.includes("deletion"),
+      );
+
     return {
       type: "element",
       tagName: settings.lineContainerTagName,
@@ -96,6 +110,8 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
           "code-line",
           showLineNumbers && "numbered-code-line",
           linesToBeHighlighted.includes(lineNumber) && "highlighted-code-line",
+          isAddition && "inserted",
+          isDeletion && "deleted",
         ]),
         dataLineNumber: showLineNumbers ? startingNumber - 1 + lineNumber : undefined,
       },
