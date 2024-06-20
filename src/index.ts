@@ -88,14 +88,16 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
     linesToBeHighlighted: number[],
   ): Element => {
     const firstChild = children[0];
+
     const isAddition =
-      firstChild.type === "element" &&
+      firstChild?.type === "element" &&
       Array.isArray(firstChild.properties.className) &&
       firstChild.properties.className.some(
         (cls) => typeof cls === "string" && cls.includes("addition"),
       );
+
     const isDeletion =
-      firstChild.type === "element" &&
+      firstChild?.type === "element" &&
       Array.isArray(firstChild.properties.className) &&
       firstChild.properties.className.some(
         (cls) => typeof cls === "string" && cls.includes("deletion"),
