@@ -279,14 +279,10 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
         if (start && !isNaN(Number(start))) startingNumber = Number(start);
       }
 
-      console.log({ startingNumber });
-
       // find number range string within curly braces and parse it
       const REGEX2 = /{(?<lines>[\d\s,-]+)}/g;
       const strLineNumbers = REGEX2.exec(meta)?.groups?.lines?.replace(/\s/g, "");
       const linesToBeHighlighted = strLineNumbers ? rangeParser(strLineNumbers) : [];
-
-      console.log({ linesToBeHighlighted });
 
       if (!showLineNumbers && linesToBeHighlighted.length === 0) return;
 
