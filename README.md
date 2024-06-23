@@ -201,6 +201,15 @@ use(rehypeHighlightLines, {
 });
 ```
 
+**An example screen snapshot from a working app:**
+
+![markdown code block input](https://github.com/rehypejs/rehype-highlight/assets/30029208/d597f4e5-d7ca-4a84-b843-950094e4a49b)
+![markdown code block result](https://github.com/rehypejs/rehype-highlight/assets/30029208/908449d6-8028-4ecd-8536-3e747c725da7)
+
+**Here you can find some demo applications below which the `rehype-highlight` and `rehype-highlight-code-lines` are used together:**
++ [demo blog application](https://next-mdx-remote-client-in-app-router.vercel.app/) using `next-mdx-remote-client` within `Next.js app router`
++ [demo blog application](https://next-mdx-remote-client-in-pages-router.vercel.app/) using `next-mdx-remote-client` within `Next.js pages router`
+
 ## Copying Code Block's Content Issue
 
 When the line container is "div" block element, the end of line character (eol) at the end of line causes unwanted extra blank line. In order to fix the issue, I've **removed the eol when it is "div", but kept the eol when it is "span"**.
