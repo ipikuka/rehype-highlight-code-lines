@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import { coverageConfigDefaults } from "vitest/config";
 
 /// <reference types="vitest" />
 export default defineConfig({
@@ -11,7 +12,7 @@ export default defineConfig({
         ["json", { file: "coverage.json" }],
         "text",
       ],
-      exclude: ["archive", "tests", "**/*.d.ts"],
+      exclude: ["archive", "tests", "**/*.d.ts", ...coverageConfigDefaults.exclude],
       thresholds: {
         lines: 100,
         functions: 100,
