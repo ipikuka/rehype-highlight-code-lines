@@ -1,6 +1,6 @@
 import type { Plugin } from "unified";
 import type { Root, Element, ElementContent, ElementData } from "hast";
-import { SKIP, type VisitorResult, visit } from "unist-util-visit";
+import { visit, type VisitorResult } from "unist-util-visit";
 import rangeParser from "parse-numeric-range";
 
 type Prettify<T> = { [K in keyof T]: T[K] } & {};
@@ -32,7 +32,7 @@ export function clsx(arr: (string | false | null | undefined | 0)[]): string[] {
 
 /**
  *
- * adds line numbers to code blocks and allow highlighting of desired code lines
+ * add line numbers to code blocks and allow highlighting of desired code lines
  *
  */
 const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
@@ -44,14 +44,17 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
   /**
    *
-   * check code element children needs flattening
+   * check code element children need flattening or not
    *
    */
-  function checkCodeTreeForFlatteningNeed(contents: ElementContent[]): boolean {
+  function checkCodeTreeForFlatteningNeed(code: Element): boolean {
+    const elementContents = code.children;
+
     // type ElementContent = Comment | Element | Text
-    for (const content of contents) {
-      if (content.type === "element")
-        if (content.children.length >= 1 && content.children[0].type === "element") return true;
+    for (const elemenContent of elementContents) {
+      if (elemenContent.type === "element")
+        if (elemenContent.children.length >= 1 && elemenContent.children[0].type === "element")
+          return true;
     }
 
     return false;
@@ -63,41 +66,44 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
    * inspired from https://github.com/react-syntax-highlighter/react-syntax-highlighter/blob/master/src/highlight.js
    *
    */
-  function flattenCodeTree(
-    contents: ElementContent[],
-    className: string[] = [],
-    newTree: ElementContent[] = [],
-  ): ElementContent[] {
-    // type ElementContent = Comment | Element | Text
-    for (const content of contents) {
-      if (content.type === "comment" || content.type === "text") {
-        newTree = newTree.concat([content]);
-      } else {
-        // @ts-expect-error className is different from other key of properties, and expected as an array
-        // /* v8 ignore next */
-        const classNames = className.concat(content.properties.className || []);
+  function flattenCodeTree(code: Element, className: string[] = []): ElementContent[] {
+    const newTree: ElementContent[] = [];
 
-        if (content.children.length === 1 && content.children[0].type !== "element") {
-          content.properties.className = classNames;
-          newTree = newTree.concat([content]);
+    for (const elementContent of code.children) {
+      if (elementContent.type === "comment" || elementContent.type === "text") {
+        newTree.push(elementContent);
+      } else {
+        // @ts-expect-error className is different from other key of properties, and expected to be an array or undefined
+        // /* v8 ignore next */
+        const classNames = className.concat(elementContent.properties.className || []);
+
+        if (
+          elementContent.children.length === 1 &&
+          elementContent.children[0].type !== "element"
+        ) {
+          elementContent.properties.className = classNames;
+          newTree.push(elementContent);
         } else {
-          newTree = newTree.concat(flattenCodeTree(content.children, classNames));
+          newTree.push(...flattenCodeTree(elementContent, classNames));
         }
       }
     }
+
+    // Mutate the original code object
+    code.children = newTree;
     return newTree;
   }
 
   /**
    *
-   * constructs the line element
+   * construct the line element
    *
    */
   const createLine = (
     children: ElementContent[],
     lineNumber: number,
     startingNumber: number,
-    showLineNumbers: boolean,
+    directiveShowLineNumbers: boolean,
     linesToBeHighlighted: number[],
   ): Element => {
     const firstChild = children[0];
@@ -123,12 +129,12 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       properties: {
         className: clsx([
           "code-line",
-          showLineNumbers && "numbered-code-line",
+          directiveShowLineNumbers && "numbered-code-line",
           linesToBeHighlighted.includes(lineNumber) && "highlighted-code-line",
           isAddition && "inserted",
           isDeletion && "deleted",
         ]),
-        dataLineNumber: showLineNumbers ? startingNumber - 1 + lineNumber : undefined,
+        dataLineNumber: directiveShowLineNumbers ? startingNumber - 1 + lineNumber : undefined,
       },
     };
   };
@@ -138,11 +144,11 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
   function gutter(
     tree: Element,
-    showLineNumbers: boolean,
+    directiveShowLineNumbers: boolean,
     startingNumber: number,
     linesToBeHighlighted: number[],
   ) {
-    const replacement: Array<ElementContent> = [];
+    const replacement: ElementContent[] = [];
 
     let index = -1;
     let start = 0;
@@ -152,56 +158,58 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
     while (++index < tree.children.length) {
       const child = tree.children[index];
 
-      if (child.type === "text") {
-        let textStart = 0;
-        let match = REGEX_LINE_BREAKS.exec(child.value);
+      if (child.type !== "text") continue;
 
-        while (match) {
-          // Nodes in this line. (current child is exclusive)
-          const line = tree.children.slice(start, index);
+      let textStart = 0;
+      let match = REGEX_LINE_BREAKS.exec(child.value);
 
-          /* v8 ignore start */
+      while (match !== null) {
+        // Nodes in this line. (current child is exclusive)
+        const line = tree.children.slice(start, index);
 
-          // Prepend text from a partial matched earlier text.
-          if (startTextRemainder) {
-            line.unshift({ type: "text", value: startTextRemainder });
-            startTextRemainder = "";
-          }
-
-          /* v8 ignore end */
-
-          // Append text from this text.
-          if (match.index > textStart) {
-            const value = child.value.slice(textStart, match.index);
-            line.push({ type: "text", value });
-          }
-
-          // Add a line
-          lineNumber += 1;
-          replacement.push(
-            createLine(line, lineNumber, startingNumber, showLineNumbers, linesToBeHighlighted),
-          );
-
-          // Add eol if the tag name is "span"
-          if (settings.lineContainerTagName === "span") {
-            replacement.push({ type: "text", value: match[0] });
-          }
-
-          start = index + 1;
-          textStart = match.index + match[0].length;
-          match = REGEX_LINE_BREAKS.exec(child.value);
+        // Prepend text from a partial matched earlier text.
+        if (startTextRemainder) {
+          line.unshift({ type: "text", value: startTextRemainder });
+          startTextRemainder = "";
         }
 
-        // If we matched, make sure to not drop the text after the last line ending.
-        if (start === index + 1) {
-          startTextRemainder = child.value.slice(textStart);
+        // Append text from this text.
+        if (match.index > textStart) {
+          const value = child.value.slice(textStart, match.index);
+          line.push({ type: "text", value });
         }
+
+        // Add a line
+        lineNumber += 1;
+        replacement.push(
+          createLine(
+            line,
+            lineNumber,
+            startingNumber,
+            directiveShowLineNumbers,
+            linesToBeHighlighted,
+          ),
+        );
+
+        // Add eol if the tag name is "span"
+        if (settings.lineContainerTagName === "span") {
+          replacement.push({ type: "text", value: match[0] });
+        }
+
+        start = index + 1;
+        textStart = match.index + match[0].length;
+
+        // iterate the match
+        match = REGEX_LINE_BREAKS.exec(child.value);
+      }
+
+      // If we matched, make sure to not drop the text after the last line ending.
+      if (start === index + 1) {
+        startTextRemainder = child.value.slice(textStart);
       }
     }
 
     const line = tree.children.slice(start);
-
-    /* v8 ignore start */
 
     // Prepend text from a partial matched earlier text.
     if (startTextRemainder) {
@@ -212,14 +220,41 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
     if (line.length > 0) {
       lineNumber += 1;
       replacement.push(
-        createLine(line, lineNumber, startingNumber, showLineNumbers, linesToBeHighlighted),
+        createLine(
+          line,
+          lineNumber,
+          startingNumber,
+          directiveShowLineNumbers,
+          linesToBeHighlighted,
+        ),
       );
     }
 
-    /* v8 ignore end */
-
     // Replace children with new array.
     tree.children = replacement;
+  }
+
+  /**
+   *
+   * get the programming language analyzing the classNames
+   *
+   */
+  function getLanguage(classNames: (string | number)[] | undefined): string | undefined {
+    const isLanguageString = (element: string | number): element is string => {
+      return String(element).startsWith("language-") || String(element).startsWith("lang-");
+    };
+
+    const languageString = classNames?.find(isLanguageString);
+
+    if (languageString?.slice(0, 5) === "lang-") {
+      return languageString.slice(5).toLowerCase();
+    }
+
+    if (languageString?.slice(0, 9) === "language-") {
+      return languageString.slice(9).toLowerCase();
+    }
+
+    return languageString;
   }
 
   /**
@@ -232,64 +267,46 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
    */
   return (tree: Root): undefined => {
     visit(tree, "element", function (node, index, parent): VisitorResult {
-      /* v8 ignore next */
-      if (!parent || index === undefined || node.tagName !== "pre") {
+      if (!parent || index === undefined || node.tagName !== "code") {
         return;
       }
 
-      const code = node.children[0];
-
-      /* v8 ignore next */
-      if (!code || code.type !== "element" || code.tagName !== "code") {
-        return SKIP;
+      if (parent.type !== "element" || parent.tagName !== "pre") {
+        return;
       }
 
-      // handle if there is no language provided in the code block
+      const code = node;
+
       const classNames = code.properties.className;
 
       // only for type narrowing
+      /* v8 ignore next */
       if (!Array.isArray(classNames) && classNames !== undefined) return;
 
-      let meta = (code.data as CodeData)?.meta?.toLowerCase().trim();
+      let meta = (code.data as CodeData)?.meta?.toLowerCase().trim() || "";
 
-      const testingFunction = (element: string | number): element is string =>
-        typeof element === "string" && element.startsWith("language-");
+      const language = getLanguage(classNames);
 
-      const className = classNames?.find(testingFunction);
+      if (
+        language?.startsWith("{") ||
+        language?.startsWith("showlinenumbers") ||
+        language?.startsWith("nolinenumbers")
+      ) {
+        // add specifiers to meta
+        meta = (language + " " + meta).trim();
 
-      // if (!className) return;
-
-      if (className) {
-        const language = className.slice(9).toLowerCase();
-
-        if (
-          language.startsWith("{") ||
-          language.startsWith("showlinenumbers") ||
-          language.startsWith("nolinenumbers")
-        ) {
-          meta = meta ? language + meta : language;
-
-          code.properties.className = undefined;
-        }
+        // remove all classnames like hljs, lang-x, language-x, because of false positive
+        code.properties.className = undefined;
       }
 
-      if (settings.showLineNumbers) {
-        if (!meta) {
-          meta = "showlinenumbers";
-        } else if (!meta.includes("showlinenumbers")) {
-          meta = meta + " showlinenumbers";
-        }
-      }
-
-      if (!meta) return;
-
-      const showLineNumbers = meta.includes("nolinenumbers")
+      const directiveShowLineNumbers = meta.includes("nolinenumbers")
         ? false
-        : meta.includes("showlinenumbers");
+        : settings.showLineNumbers || meta.includes("showlinenumbers");
 
       let startingNumber = 1;
 
-      if (showLineNumbers) {
+      // find the number where the line number starts, if exists
+      if (directiveShowLineNumbers) {
         const REGEX1 = /showlinenumbers=(?<start>\d+)/i;
         const start = REGEX1.exec(meta)?.groups?.start;
         if (start && !isNaN(Number(start))) startingNumber = Number(start);
@@ -300,15 +317,16 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       const strLineNumbers = REGEX2.exec(meta)?.groups?.lines?.replace(/\s/g, "");
       const linesToBeHighlighted = strLineNumbers ? rangeParser(strLineNumbers) : [];
 
-      if (!showLineNumbers && linesToBeHighlighted.length === 0) return;
+      // if nothing to do for numbering and highlihting, just return
+      if (!directiveShowLineNumbers && linesToBeHighlighted.length === 0) return;
 
-      // flatten deeper nodes into first level <span> and text
-      if (checkCodeTreeForFlatteningNeed(code.children)) {
-        code.children = flattenCodeTree(code.children);
+      // flatten deeper nodes into first level <span> and text, especially for languages like jsx, tsx
+      if (checkCodeTreeForFlatteningNeed(code)) {
+        flattenCodeTree(code);
       }
 
-      // add wrapper for each line mutating the code element
-      gutter(code, showLineNumbers, startingNumber, linesToBeHighlighted);
+      // add container for each line mutating the code element
+      gutter(code, directiveShowLineNumbers, startingNumber, linesToBeHighlighted);
     });
   };
 };

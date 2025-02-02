@@ -1,22 +1,22 @@
 # rehype-highlight-code-lines
 
-[![NPM version][badge-npm-version]][url-npm-package]
-[![NPM downloads][badge-npm-download]][url-npm-package]
-[![Build][badge-publish-to-npm]][url-publish-github-actions]
-[![codecov][badge-codecov]][url-codecov]
+[![npm version][badge-npm-version]][url-npm-package]
+[![npm downloads][badge-npm-download]][url-npm-package]
+[![publish to npm][badge-publish-to-npm]][url-publish-github-actions]
+[![code-coverage][badge-codecov]][url-codecov]
 [![type-coverage][badge-type-coverage]][url-github-package]
 [![typescript][badge-typescript]][url-typescript]
-[![License][badge-license]][url-license]
+[![license][badge-license]][url-license]
 
-This package is a [unified][unified] ([rehype][rehype]) plugin **to add container to each line in a code block, allowing numbering of the code block and highlighting desired lines of code**.
+This package is a **[unified][unified]** (**[rehype][rehype]**) plugin that **wraps each line of code in a container, enabling code block numbering and line highlighting**.
 
-**[unified][unified]** is a project that transforms content with abstract syntax trees (ASTs) using the new parser **[micromark][micromark]**. **[remark][remark]** adds support for markdown to unified. **[mdast][mdast]** is the Markdown Abstract Syntax Tree (AST) which is a specification for representing markdown in a syntax tree. "**[rehype][rehype]**" is a tool that transforms HTML with plugins. "**[hast][hast]**" stands for HTML Abstract Syntax Tree (HAST) that rehype uses.
+**[unified][unified]** is a project that transforms content with abstract syntax trees (ASTs) using the new parser **[micromark][micromark]**. **[remark][remark]** adds support for markdown to unified. **[mdast][mdast]** is the Markdown Abstract Syntax Tree (AST) which is a specification for representing markdown in a syntax tree. **[rehype][rehype]** is a tool that transforms HTML with plugins. **[hast][hast]** stands for HTML Abstract Syntax Tree (HAST) that rehype uses.
 
-**This plugin allows adding line numbers to code blocks and highlighting of desired code lines.**
+**This plugin enables line numbering for code blocks and highlights specific lines as needed.**
 
 ## When should I use this?
 
-The `rehype-highlight-code-lines` is useful if you want to add line numbers to code blocks and want to highlight desired code lines.
+The `rehype-highlight-code-lines`  is ideal for adding line numbers to code blocks and highlighting specific lines.
 
 **The `rehype-highlight-code-lines` is NOT code highlighter and does NOT provide code highlighting!** You can use a code highlighter for example **[rehype-highlight][rehype-highlight]** to highlight the code, then use the `rehype-highlight-code-lines` **after**. 
 
@@ -42,9 +42,9 @@ yarn add rehype-highlight-code-lines
 
 ## Usage
 
-In a code fence, just after the language of the code block,
-+ specify a range of number in curly braces in order to highlight desired code lines,
-+ and/or add `showLineNumbers` in order to add numbering to code lines.
+In a code fence, right after the language of the code block:
++ Use curly braces `{}` to specify a range of line numbers to highlight specific lines.
++ Add `showLineNumbers` to enable line numbering.
 
 **\`\`\`[language] {2,4-6} showLineNumbers**
 
@@ -54,7 +54,7 @@ In a code fence, just after the language of the code block,
 
 **\`\`\`[language] showLineNumbers**
 
-You can use the specifiers without a language.
+You can use the specifiers without a language:
 
 **\`\`\`{5} showLineNumbers**
 

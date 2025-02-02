@@ -462,6 +462,37 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   // ******************************************
+  it.skip("with language jsx, after flattened, for reference, fake test", async () => {
+    const input = dedent`
+      \`\`\`javascript
+      function MyComponent() {
+        return (
+          <MDXClient
+            {...mdxSource}
+            components={components}
+          />
+        );
+      };
+      \`\`\`
+    `;
+
+    const html = String(await process(input));
+
+    expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">MyComponent</span>() {
+        <span class="hljs-keyword">return</span> (
+          &#x3C;<span class="xml hljs-tag hljs-name">MDXClient</span>
+            {<span class="xml hljs-tag hljs-attr">...mdxSource</span>}
+            <span class="xml hljs-tag hljs-attr">components</span>=<span class="xml hljs-tag hljs-string">{components}</span>
+          />
+        );
+      };
+      </code></pre>
+      "
+    `);
+  });
+
+  // ******************************************
   it("with language jsx, with line numbering and line highlighting", async () => {
     const input = dedent`
       \`\`\`javascript showLineNumbers {4}
