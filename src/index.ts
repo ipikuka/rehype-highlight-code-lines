@@ -1,6 +1,6 @@
 import type { Plugin } from "unified";
 import type { Root, Element, ElementContent, ElementData } from "hast";
-import { type VisitorResult, visit, CONTINUE } from "unist-util-visit";
+import { SKIP, type VisitorResult, visit } from "unist-util-visit";
 import rangeParser from "parse-numeric-range";
 
 // eslint-disable-next-line @typescript-eslint/ban-types
@@ -46,29 +46,44 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
   /**
    *
-   * flatten code element children
+   * check code element children needs flattening
+   *
+   */
+  function checkCodeTreeForFlatteningNeed(contents: ElementContent[]): boolean {
+    // type ElementContent = Comment | Element | Text
+    for (const content of contents) {
+      if (content.type === "element")
+        if (content.children.length >= 1 && content.children[0].type === "element") return true;
+    }
+
+    return false;
+  }
+
+  /**
+   *
+   * flatten code element children, recursively
    * inspired from https://github.com/react-syntax-highlighter/react-syntax-highlighter/blob/master/src/highlight.js
    *
    */
   function flattenCodeTree(
-    children: ElementContent[],
+    contents: ElementContent[],
     className: string[] = [],
     newTree: ElementContent[] = [],
   ): ElementContent[] {
-    for (let i = 0; i < children.length; i++) {
-      const node = children[i];
-      if (node.type !== "element") {
-        newTree = newTree.concat([node]);
+    // type ElementContent = Comment | Element | Text
+    for (const content of contents) {
+      if (content.type === "comment" || content.type === "text") {
+        newTree = newTree.concat([content]);
       } else {
         // @ts-expect-error
         // /* v8 ignore next */
-        const classNames = className.concat(node.properties?.className || []);
+        const classNames = className.concat(content.properties.className || []);
 
-        if (node.children.length === 1 && node.children[0].type !== "element") {
-          node.properties.className = classNames;
-          newTree = newTree.concat([node]);
+        if (content.children.length === 1 && content.children[0].type !== "element") {
+          content.properties.className = classNames;
+          newTree = newTree.concat([content]);
         } else {
-          newTree = newTree.concat(flattenCodeTree(node.children, classNames));
+          newTree = newTree.concat(flattenCodeTree(content.children, classNames));
         }
       }
     }
@@ -121,7 +136,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
   };
 
   // match all common types of line breaks
-  const RE = /\r?\n|\r/g;
+  const REGEX_LINE_BREAKS = /\r?\n|\r/g;
 
   function gutter(
     tree: Element,
@@ -141,7 +156,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
       if (child.type === "text") {
         let textStart = 0;
-        let match = RE.exec(child.value);
+        let match = REGEX_LINE_BREAKS.exec(child.value);
 
         while (match) {
           // Nodes in this line. (current child is exclusive)
@@ -176,7 +191,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
           start = index + 1;
           textStart = match.index + match[0].length;
-          match = RE.exec(child.value);
+          match = REGEX_LINE_BREAKS.exec(child.value);
         }
 
         // If we matched, make sure to not drop the text after the last line ending.
@@ -220,40 +235,43 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
   return (tree: Root): undefined => {
     visit(tree, "element", function (node, index, parent): VisitorResult {
       /* v8 ignore next */
-      if (!parent || typeof index === "undefined") return;
-
-      if (node.tagName !== "pre") return CONTINUE;
+      if (!parent || index === undefined || node.tagName !== "pre") {
+        return;
+      }
 
       const code = node.children[0];
 
       /* v8 ignore next */
-      if (!code || code.type !== "element" || code.tagName !== "code") return;
+      if (!code || code.type !== "element" || code.tagName !== "code") {
+        return SKIP;
+      }
+
+      // handle if there is no language provided in the code block
+      const classNames = code.properties.className;
+
+      // only for type narrowing
+      if (!Array.isArray(classNames) && classNames !== undefined) return;
 
       let meta = (code.data as CodeData)?.meta?.toLowerCase().trim();
 
-      // handle if there is no language provided in code block
-      if (Array.isArray(code.properties.className)) {
-        const testingFunction = (element: string | number): element is string =>
-          typeof element === "string" && element.startsWith("language-");
+      const testingFunction = (element: string | number): element is string =>
+        typeof element === "string" && element.startsWith("language-");
 
-        const className = code.properties.className.find(testingFunction);
+      const className = classNames?.find(testingFunction);
 
-        if (className) {
-          const language = className.slice(9).toLowerCase();
+      // if (!className) return;
 
-          if (
-            language.startsWith("{") ||
-            language.startsWith("showlinenumbers") ||
-            language.startsWith("nolinenumbers")
-          ) {
-            meta = meta ? language + meta : language;
+      if (className) {
+        const language = className.slice(9).toLowerCase();
 
-            const idx = code.properties.className.findIndex(testingFunction);
+        if (
+          language.startsWith("{") ||
+          language.startsWith("showlinenumbers") ||
+          language.startsWith("nolinenumbers")
+        ) {
+          meta = meta ? language + meta : language;
 
-            if (idx > -1) {
-              code.properties.className[idx] = "language-unknown";
-            }
-          }
+          code.properties.className = undefined;
         }
       }
 
@@ -286,8 +304,10 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
       if (!showLineNumbers && linesToBeHighlighted.length === 0) return;
 
-      // flatten deeper nodes into first level <span>s an texts
-      code.children = flattenCodeTree(code.children);
+      // flatten deeper nodes into first level <span> and text
+      if (checkCodeTreeForFlatteningNeed(code.children)) {
+        code.children = flattenCodeTree(code.children);
+      }
 
       // add wrapper for each line mutating the code element
       gutter(code, showLineNumbers, startingNumber, linesToBeHighlighted);
