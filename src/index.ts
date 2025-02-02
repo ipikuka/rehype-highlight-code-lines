@@ -3,10 +3,8 @@ import type { Root, Element, ElementContent, ElementData } from "hast";
 import { SKIP, type VisitorResult, visit } from "unist-util-visit";
 import rangeParser from "parse-numeric-range";
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
-// eslint-disable-next-line @typescript-eslint/ban-types
 type PartiallyRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
 
 export type HighlightLinesOptions = {
@@ -75,7 +73,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       if (content.type === "comment" || content.type === "text") {
         newTree = newTree.concat([content]);
       } else {
-        // @ts-expect-error
+        // @ts-expect-error className is different from other key of properties, and expected as an array
         // /* v8 ignore next */
         const classNames = className.concat(content.properties.className || []);
 

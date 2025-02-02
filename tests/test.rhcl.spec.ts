@@ -323,7 +323,7 @@ describe("reyhpe-highlight-code-lines", () => {
     );
   });
 
-  it("should reprocess exact", async () => {
+  it("should reprocess exact 1", async () => {
     const file = await rehype()
       .data("settings", { fragment: true })
       .use(rehypeHighlight)
@@ -361,7 +361,7 @@ describe("reyhpe-highlight-code-lines", () => {
     );
   });
 
-  it("should reprocess exact", async () => {
+  it("should reprocess exact 2", async () => {
     const file = await rehype()
       .data("settings", { fragment: true })
       .use(rehypeHighlight)
