@@ -420,7 +420,7 @@ describe("reyhpe-highlight-code-lines", () => {
       [
         "<h1>Hello World!</h1>",
         "",
-        '<pre><code class="hljs language-scss">test <span class="hljs-attribute">normal</span> text</code></pre>',
+        '<pre><code class="hljs language-scss">test <span class="hljs-attribute">normal</span> <span class="hljs-selector-tag">text</span></code></pre>',
       ].join("\n"),
     );
   });

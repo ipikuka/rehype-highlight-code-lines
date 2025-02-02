@@ -1,12 +1,12 @@
 # rehype-highlight-code-lines
 
-[![NPM version][badge-npm-version]][npm-package-url]
-[![NPM downloads][badge-npm-download]][npm-package-url]
-[![Build][badge-build]][github-workflow-url]
-[![codecov](https://codecov.io/gh/ipikuka/rehype-highlight-code-lines/graph/badge.svg?token=RKrZlvMHwq)](https://codecov.io/gh/ipikuka/rehype-highlight-code-lines)
-[![type-coverage](https://img.shields.io/badge/dynamic/json.svg?label=type-coverage&prefix=%E2%89%A5&suffix=%&query=$.typeCoverage.atLeast&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fipikuka%2Frehype-highlight-code-lines%2Fmaster%2Fpackage.json)](https://github.com/ipikuka/rehype-highlight-code-lines)
-[![typescript][badge-typescript]][typescript-url]
-[![License][badge-license]][github-license-url]
+[![NPM version][badge-npm-version]][url-npm-package]
+[![NPM downloads][badge-npm-download]][url-npm-package]
+[![Build][badge-publish-to-npm]][url-publish-github-actions]
+[![codecov][badge-codecov]][url-codecov]
+[![type-coverage][badge-type-coverage]][url-github-package]
+[![typescript][badge-typescript]][url-typescript]
+[![License][badge-license]][url-license]
 
 This package is a [unified][unified] ([rehype][rehype]) plugin **to add container to each line in a code block, allowing numbering of the code block and highlighting desired lines of code**.
 
@@ -324,7 +324,7 @@ This plugin modifies the `hast` (HTML abstract syntax tree).
 
 ## Types
 
-This package is fully typed with [TypeScript][typescript].
+This package is fully typed with [TypeScript][url-typescript].
 
 The plugin exports the type `HighlightLinesOptions`.
 
@@ -375,17 +375,6 @@ I like to contribute the Unified / Remark / MDX ecosystem, so I recommend you to
 
 [MIT License](./LICENSE) © ipikuka
 
-### Keywords
-
-🟩 [unified][unifiednpm] 🟩 [rehype][rehypenpm] 🟩 [rehype plugin][rehypepluginnpm] 🟩 [hast][hastnpm] 🟩 [markdown][markdownnpm] 🟩 [rehype-highlight][rehypehighlightnpm]
-
-[unifiednpm]: https://www.npmjs.com/search?q=keywords:unified
-[rehypenpm]: https://www.npmjs.com/search?q=keywords:rehype
-[rehypepluginnpm]: https://www.npmjs.com/search?q=keywords:rehype%20plugin
-[hastnpm]: https://www.npmjs.com/search?q=keywords:hast
-[markdownnpm]: https://www.npmjs.com/search?q=keywords:markdown
-[rehypehighlightnpm]: https://www.npmjs.com/search?q=keywords:rehype-highlight
-
 [unified]: https://github.com/unifiedjs/unified
 [micromark]: https://github.com/micromark/micromark
 [remark]: https://github.com/remarkjs/remark
@@ -394,18 +383,23 @@ I like to contribute the Unified / Remark / MDX ecosystem, so I recommend you to
 [rehype]: https://github.com/rehypejs/rehype
 [rehypeplugins]: https://github.com/rehypejs/rehype/blob/main/doc/plugins.md
 [hast]: https://github.com/syntax-tree/hast
-[typescript]: https://www.typescriptlang.org/
 [rehype-highlight]: https://github.com/rehypejs/rehype-highlight
 
 [badge-npm-version]: https://img.shields.io/npm/v/rehype-highlight-code-lines
 [badge-npm-download]:https://img.shields.io/npm/dt/rehype-highlight-code-lines
-[npm-package-url]: https://www.npmjs.com/package/rehype-highlight-code-lines
+[url-npm-package]: https://www.npmjs.com/package/rehype-highlight-code-lines
+[url-github-package]: https://github.com/ipikuka/rehype-highlight-code-lines
 
 [badge-license]: https://img.shields.io/github/license/ipikuka/rehype-highlight-code-lines
-[github-license-url]: https://github.com/ipikuka/rehype-highlight-code-lines/blob/main/LICENSE
+[url-license]: https://github.com/ipikuka/rehype-highlight-code-lines/blob/main/LICENSE
 
-[badge-build]: https://github.com/ipikuka/rehype-highlight-code-lines/actions/workflows/publish.yml/badge.svg
-[github-workflow-url]: https://github.com/ipikuka/rehype-highlight-code-lines/actions/workflows/publish.yml
+[badge-publish-to-npm]: https://github.com/ipikuka/rehype-highlight-code-lines/actions/workflows/publish.yml/badge.svg
+[url-publish-github-actions]: https://github.com/ipikuka/rehype-highlight-code-lines/actions/workflows/publish.yml
 
 [badge-typescript]: https://img.shields.io/npm/types/rehype-highlight-code-lines
-[typescript-url]: https://www.typescriptlang.org/
+[url-typescript]: https://www.typescriptlang.org
+
+[badge-codecov]: https://codecov.io/gh/ipikuka/rehype-highlight-code-lines/graph/badge.svg?token=RKrZlvMHwq
+[url-codecov]: https://codecov.io/gh/ipikuka/rehype-highlight-code-lines
+
+[badge-type-coverage]: https://img.shields.io/badge/dynamic/json.svg?label=type-coverage&prefix=%E2%89%A5&suffix=%&query=$.typeCoverage.atLeast&uri=https%3A%2F%2Fraw.githubusercontent.com%2Fipikuka%2Frehype-highlight-code-lines%2Fmain%2Fpackage.json
