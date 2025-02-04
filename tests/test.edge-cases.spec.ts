@@ -14,7 +14,7 @@ declare global {
   }
 }
 
-// it prettifies the <pre> opening tag putting new line right after
+// prettify <pre> putting new line right after opening tag
 String.prototype.prettifyPre = function () {
   return this.replace(/<pre>(?!\n)/g, "<pre>\n");
 };

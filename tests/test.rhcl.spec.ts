@@ -1,8 +1,10 @@
 import { describe, it, expect } from "vitest";
 
-import { common, type LanguageFn } from "lowlight";
-import { rehype } from "rehype";
+import { unified } from "unified";
+import rehypeParse from "rehype-parse";
+import rehypeStringify from "rehype-stringify";
 import rehypeHighlight from "rehype-highlight";
+import { common, type LanguageFn } from "lowlight";
 
 import plugin from "../src";
 
@@ -22,10 +24,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should work on empty code", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { detect: true })
       .use(plugin)
+      .use(rehypeStringify)
       .process(["<h1>Hello World!</h1>", "", "<pre><code></code></pre>"].join("\n"));
 
     expect(String(file)).toEqual(
@@ -34,10 +37,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should not highlight (no class)", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         ["<h1>Hello World!</h1>", "", '<pre><code>"use strict";</code></pre>'].join("\n"),
       );
@@ -48,10 +52,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should highlight (`detect`, no class)", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { detect: true })
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         ["<h1>Hello World!</h1>", "", '<pre><code>"use strict";</code></pre>'].join("\n"),
       );
@@ -66,10 +71,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should highlight (detect, no class, subset)", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { detect: true, subset: ["arduino"] })
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         ["<h1>Hello World!</h1>", "", '<pre><code>"use strict";</code></pre>'].join("\n"),
       );
@@ -84,10 +90,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should not highlight (`detect: false`, no class)", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { detect: false })
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         ["<h1>Hello World!</h1>", "", '<pre><code>"use strict";</code></pre>'].join("\n"),
       );
@@ -98,10 +105,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should highlight (prefix without dash)", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { detect: true, prefix: "foo" })
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         ["<h1>Hello World!</h1>", "", '<pre><code>"use strict";</code></pre>'].join("\n"),
       );
@@ -116,10 +124,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should highlight (prefix with dash)", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { detect: true, prefix: "foo-" })
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         ["<h1>Hello World!</h1>", "", '<pre><code>"use strict";</code></pre>'].join("\n"),
       );
@@ -134,10 +143,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should highlight (lang class)", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         [
           "<h1>Hello World!</h1>",
@@ -158,10 +168,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should highlight (language class)", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         [
           "<h1>Hello World!</h1>",
@@ -182,10 +193,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should highlight (long name)", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         [
           "<h1>Hello World!</h1>",
@@ -206,10 +218,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should not highlight (`no-highlight`)", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         [
           "<h1>Hello World!</h1>",
@@ -230,10 +243,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should prefer `no-highlight` over a `language-*` class", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         '<h1>Hello World!</h1>\n<pre><code class="lang-js no-highlight">alert(1)</code></pre>',
       );
@@ -244,10 +258,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should not highlight (`nohighlight`)", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         [
           "<h1>Hello World!</h1>",
@@ -268,10 +283,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should warn on missing languages", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         [
           "<h1>Hello World!</h1>",
@@ -287,10 +303,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should not highlight plainText-ed languages", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { plainText: ["js"] })
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         [
           "<h1>Hello World!</h1>",
@@ -312,10 +329,11 @@ describe("reyhpe-highlight-code-lines", () => {
 
   it("should not remove contents", async () => {
     // For some reason this isn’t detected as c++.
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { detect: true, subset: ["cpp"] })
       .use(plugin)
+      .use(rehypeStringify)
       .process(`<pre><code>def add(a, b):\n  return a + b</code></pre>`);
 
     expect(String(file)).toEqual(
@@ -324,8 +342,10 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should support multiple `code`s in a `pre`", async () => {
-    const file = await rehype().data("settings", { fragment: true }).use(rehypeHighlight)
-      .process(`<pre>
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
+      .use(rehypeHighlight)
+      .use(rehypeStringify).process(`<pre>
   <code class="language-javascript">const a = 1;</code>
   <code class="language-python">printf("x")</code>
 </pre>`);
@@ -335,11 +355,12 @@ describe("reyhpe-highlight-code-lines", () => {
     );
   });
 
-  it("should reprocess exact 1", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+  it("should reprocess exact", async () => {
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         [
           "<h1>Hello World!</h1>",
@@ -360,12 +381,13 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should parse custom language", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, {
         aliases: { javascript: ["funkyscript"] },
       })
       .use(plugin)
+      .use(rehypeStringify)
       .process('<pre><code class="lang-funkyscript">console.log(1)</code></pre>');
 
     expect(String(file)).toEqual(
@@ -373,35 +395,12 @@ describe("reyhpe-highlight-code-lines", () => {
     );
   });
 
-  it("should reprocess exact 2", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
-      .use(rehypeHighlight)
-      .use(plugin)
-      .process(
-        [
-          "<h1>Hello World!</h1>",
-          "",
-          '<pre><code class="hljs lang-js"><span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;',
-          '<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)</code></pre>',
-        ].join("\n"),
-      );
-
-    expect(String(file)).toEqual(
-      [
-        "<h1>Hello World!</h1>",
-        "",
-        '<pre><code class="hljs lang-js"><span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;',
-        '<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)</code></pre>',
-      ].join("\n"),
-    );
-  });
-
   it("should ignore comments", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { detect: true })
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         ["<h1>Hello World!</h1>", "", '<pre><code><!--TODO-->"use strict";</code></pre>'].join(
           "\n",
@@ -418,10 +417,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should support `<br>` elements", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         [
           "<h1>Hello World!</h1>",
@@ -441,10 +441,11 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should register languages", async () => {
-    const file = await rehype()
-      .data("settings", { fragment: true })
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { languages: { ...common, test: testLang } })
       .use(plugin)
+      .use(rehypeStringify)
       .process(
         [
           "<h1>Hello World!</h1>",
