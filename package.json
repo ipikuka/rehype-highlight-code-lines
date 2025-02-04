@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "test": "vitest --watch=false",
     "test:watch": "vitest",
-    "test:file": "vitest test.edge-cases.spec.ts",
+    "test:file": "vitest test.html.spec.ts",
     "prepack": "npm run build",
     "prepublishOnly": "npm run test && npm run format && npm run test-coverage",
     "test-coverage": "vitest run --coverage"
@@ -72,6 +72,7 @@
     "type-coverage": "^2.29.7",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.22.0",
+    "unist-util-remove-position": "^5.0.0",
     "vfile": "^6.0.3",
     "vitest": "^3.0.5"
   },
