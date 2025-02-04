@@ -54,7 +54,7 @@
     "@eslint/js": "^9.19.0",
     "@types/dedent": "^0.7.2",
     "@types/node": "^22.13.0",
-    "@vitest/coverage-v8": "^3.0.4",
+    "@vitest/coverage-v8": "^3.0.5",
     "@vitest/eslint-plugin": "^1.1.25",
     "dedent": "^1.5.3",
     "eslint": "^9.19.0",
@@ -62,7 +62,8 @@
     "eslint-plugin-prettier": "^5.2.3",
     "prettier": "^3.4.2",
     "rehype": "^13.0.2",
-    "rehype-highlight": "^7.0.1",
+    "rehype-highlight": "^7.0.2",
+    "rehype-parse": "^9.0.1",
     "rehype-stringify": "^10.0.1",
     "remark-gfm": "^4.0.0",
     "remark-parse": "^11.0.0",
@@ -72,7 +73,7 @@
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.22.0",
     "vfile": "^6.0.3",
-    "vitest": "^3.0.4"
+    "vitest": "^3.0.5"
   },
   "dependencies": {
     "@types/hast": "^3.0.4",

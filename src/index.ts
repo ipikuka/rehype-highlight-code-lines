@@ -142,6 +142,18 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
   // match all common types of line breaks
   const REGEX_LINE_BREAKS = /\r?\n|\r/g;
 
+  /**
+   *
+   * check the code line is empty or with value only spaces
+   *
+   */
+  function isEmptyLine(line: ElementContent[]): boolean {
+    return (
+      line.length === 0 ||
+      (line.length === 1 && line[0].type === "text" && line[0].value.trim() === "")
+    );
+  }
+
   function gutter(
     tree: Element,
     directiveShowLineNumbers: boolean,
@@ -179,17 +191,18 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
           line.push({ type: "text", value });
         }
 
-        // Add a line
-        lineNumber += 1;
-        replacement.push(
-          createLine(
-            line,
-            lineNumber,
-            startingNumber,
-            directiveShowLineNumbers,
-            linesToBeHighlighted,
-          ),
-        );
+        if (!isEmptyLine(line)) {
+          lineNumber += 1;
+          replacement.push(
+            createLine(
+              line,
+              lineNumber,
+              startingNumber,
+              directiveShowLineNumbers,
+              linesToBeHighlighted,
+            ),
+          );
+        }
 
         // Add eol if the tag name is "span"
         if (settings.lineContainerTagName === "span") {
@@ -217,17 +230,19 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       startTextRemainder = "";
     }
 
-    if (line.length > 0) {
-      lineNumber += 1;
-      replacement.push(
-        createLine(
-          line,
-          lineNumber,
-          startingNumber,
-          directiveShowLineNumbers,
-          linesToBeHighlighted,
-        ),
-      );
+    if (!isEmptyLine(line)) {
+      if (line.length > 0) {
+        lineNumber += 1;
+        replacement.push(
+          createLine(
+            line,
+            lineNumber,
+            startingNumber,
+            directiveShowLineNumbers,
+            linesToBeHighlighted,
+          ),
+        );
+      }
     }
 
     // Replace children with new array.

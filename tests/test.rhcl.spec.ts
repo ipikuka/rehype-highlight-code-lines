@@ -323,6 +323,18 @@ describe("reyhpe-highlight-code-lines", () => {
     );
   });
 
+  it("should support multiple `code`s in a `pre`", async () => {
+    const file = await rehype().data("settings", { fragment: true }).use(rehypeHighlight)
+      .process(`<pre>
+  <code class="language-javascript">const a = 1;</code>
+  <code class="language-python">printf("x")</code>
+</pre>`);
+
+    expect(String(file)).toEqual(
+      '<pre>  <code class="hljs language-javascript"><span class="hljs-keyword">const</span> a = <span class="hljs-number">1</span>;</code>\n  <code class="hljs language-python">printf(<span class="hljs-string">"x"</span>)</code>\n</pre>',
+    );
+  });
+
   it("should reprocess exact 1", async () => {
     const file = await rehype()
       .data("settings", { fragment: true })
