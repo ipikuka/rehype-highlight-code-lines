@@ -166,7 +166,7 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   // ******************************************
-  it("with language, with line highlighting and line numbering, tag name is div", async () => {
+  it("with language, with line highlighting and line numbering, tag name is still 'span' despite the option", async () => {
     const input = dedent`
       \`\`\`javascript {2} showLineNumbers
       const a1=1;
@@ -180,21 +180,21 @@ describe("reyhpe-highlight-code-lines", () => {
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
-          <div class="code-line numbered-code-line" data-line-number="1">
+          <span class="code-line numbered-code-line" data-line-number="1">
             <span class="hljs-keyword">const</span> a1=
             <span class="hljs-number">1</span>;
-          </div>
-          <div
+          </span>
+          <span
             class="code-line numbered-code-line highlighted-code-line"
             data-line-number="2"
           >
             <span class="hljs-keyword">const</span> a2=
             <span class="hljs-number">2</span>;
-          </div>
-          <div class="code-line numbered-code-line" data-line-number="3">
+          </span>
+          <span class="code-line numbered-code-line" data-line-number="3">
             <span class="hljs-keyword">const</span> a3=
             <span class="hljs-number">3</span>;
-          </div>
+          </span>
         </code>
       </pre>
       "
@@ -518,35 +518,6 @@ describe("reyhpe-highlight-code-lines", () => {
       <span class="code-line numbered-code-line" data-line-number="6">    /></span>
       <span class="code-line numbered-code-line" data-line-number="7">  );</span>
       <span class="code-line numbered-code-line" data-line-number="8">};</span>
-      </code></pre>
-      "
-    `);
-  });
-
-  // ******************************************
-  it.skip("with language jsx, with line numbering and line highlighting, tag name is div", async () => {
-    const input = dedent`
-      \`\`\`javascript showLineNumbers {4}
-      function MyComponent() {
-        return (
-          <MDXProvider>
-            <MDXClient {...mdxSource} />
-          </MDXProvider>
-        );
-      };
-      \`\`\`
-    `;
-
-    const html = String(await process(input, { lineContainerTagName: "div" }));
-
-    expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript"><div class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">function</span> <span class="hljs-title function_">MyComponent</span>() {</div>
-      <div class="code-line numbered-code-line" data-line-number="2">  <span class="hljs-keyword">return</span> (</div>
-      <div class="code-line numbered-code-line" data-line-number="3">    &#x3C;<span class="xml hljs-tag hljs-name">MDXProvider</span>></div>
-      <div class="code-line numbered-code-line highlighted-code-line" data-line-number="4">      &#x3C;<span class="xml hljs-tag hljs-name">MDXClient</span> {<span class="xml hljs-tag hljs-attr">...mdxSource</span>} /></div>
-      <div class="code-line numbered-code-line" data-line-number="5">    &#x3C;/<span class="xml hljs-tag hljs-name">MDXProvider</span>></div>
-      <div class="code-line numbered-code-line" data-line-number="6">  );</div>
-      <div class="code-line numbered-code-line" data-line-number="7">};</div>
       </code></pre>
       "
     `);

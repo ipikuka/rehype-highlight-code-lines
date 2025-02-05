@@ -4,21 +4,12 @@ import { unified } from "unified";
 import rehypeParse from "rehype-parse";
 import rehypeStringify from "rehype-stringify";
 import rehypeHighlight from "rehype-highlight";
-import { common, type LanguageFn } from "lowlight";
 
 import plugin from "../../src";
 
 // all the test is taken from `rehype-highlight` for reference
 // only added `rehype-highlight-code-lines` to see no change the test results
 describe("reyhpe-highlight-code-lines", () => {
-  const testLang: LanguageFn = function () {
-    return {
-      aliases: ["test"],
-      contains: [],
-      keywords: { keyword: "test" },
-    };
-  };
-
   it("should work on empty code, no line numbering due to lack of piece of code", async () => {
     const file = await unified()
       .use(rehypeParse, { fragment: true })
@@ -427,42 +418,29 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should reprocess exact", async () => {
+    const expected = [
+      [
+        '<pre><code class="hljs lang-js">',
+        '<span class="code-line numbered-code-line" data-line-number="1">',
+        '<span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;',
+        "</span>",
+      ].join(""),
+      [
+        '<span class="code-line numbered-code-line" data-line-number="2">',
+        '<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>',
+        '(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)',
+        "</span></code></pre>",
+      ].join(""),
+    ].join("\n");
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process(
-        [
-          [
-            '<pre><code class="hljs lang-js">',
-            '<span class="code-line numbered-code-line" data-line-number="1">',
-            '<span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;',
-            "</span>",
-          ].join(""),
-          [
-            '<span class="code-line numbered-code-line" data-line-number="2">',
-            '<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)',
-            "</span></code></pre>",
-          ].join(""),
-        ].join("\n"),
-      );
+      .process(expected);
 
-    expect(String(file)).toEqual(
-      [
-        [
-          '<pre><code class="hljs lang-js">',
-          '<span class="code-line numbered-code-line" data-line-number="1">',
-          '<span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;',
-          "</span>",
-        ].join(""),
-        [
-          '<span class="code-line numbered-code-line" data-line-number="2">',
-          '<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)',
-          "</span></code></pre>",
-        ].join(""),
-      ].join("\n"),
-    );
+    expect(String(file)).toEqual(expected);
   });
 
   it("should parse custom language", async () => {
@@ -533,16 +511,26 @@ describe("reyhpe-highlight-code-lines", () => {
   it("should register languages", async () => {
     const file = await unified()
       .use(rehypeParse, { fragment: true })
-      .use(rehypeHighlight, { languages: { ...common, test: testLang } })
+      .use(rehypeHighlight, {
+        languages: {
+          test() {
+            return {
+              aliases: [],
+              contains: [],
+              keywords: { keyword: "bravo" },
+            };
+          },
+        },
+      })
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process('<pre><code class="language-scss">test normal text</code></pre>');
+      .process('<pre><code class="language-test">alpha bravo charlie</code></pre>');
 
     expect(String(file)).toEqual(
       [
-        '<pre><code class="hljs language-scss">',
+        '<pre><code class="hljs language-test">',
         '<span class="code-line numbered-code-line" data-line-number="1">',
-        'test <span class="hljs-attribute">normal</span> <span class="hljs-selector-tag">text</span>',
+        'alpha <span class="hljs-keyword">bravo</span> charlie',
         "</span></code></pre>",
       ].join(""),
     );

@@ -4,21 +4,12 @@ import { unified } from "unified";
 import rehypeParse from "rehype-parse";
 import rehypeStringify from "rehype-stringify";
 import rehypeHighlight from "rehype-highlight";
-import { common, type LanguageFn } from "lowlight";
 
 import plugin from "../../src";
 
 // all the test is taken from `rehype-highlight` for reference
 // only added `rehype-highlight-code-lines` to see no change the test results
 describe("reyhpe-highlight-code-lines", () => {
-  const testLang: LanguageFn = function () {
-    return {
-      aliases: ["test"],
-      contains: [],
-      keywords: { keyword: "test" },
-    };
-  };
-
   it("should expose the public api", async () => {
     expect(Object.keys(await import("rehype-highlight")).sort()).toEqual(["default"]);
   });
@@ -356,28 +347,21 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   it("should reprocess exact", async () => {
+    const expected = [
+      "<h1>Hello World!</h1>",
+      "",
+      '<pre><code class="hljs lang-js"><span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;',
+      '<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)</code></pre>',
+    ].join("\n");
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin)
       .use(rehypeStringify)
-      .process(
-        [
-          "<h1>Hello World!</h1>",
-          "",
-          '<pre><code class="hljs lang-js"><span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;',
-          '<span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)</code></pre>',
-        ].join("\n"),
-      );
+      .process(expected);
 
-    expect(String(file)).toEqual(
-      [
-        "<h1>Hello World!</h1>",
-        "",
-        '<pre><code class="hljs lang-js"><span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;',
-        '<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)</code></pre>',
-      ].join("\n"),
-    );
+    expect(String(file)).toEqual(expected);
   });
 
   it("should parse custom language", async () => {
@@ -443,14 +427,24 @@ describe("reyhpe-highlight-code-lines", () => {
   it("should register languages", async () => {
     const file = await unified()
       .use(rehypeParse, { fragment: true })
-      .use(rehypeHighlight, { languages: { ...common, test: testLang } })
+      .use(rehypeHighlight, {
+        languages: {
+          test() {
+            return {
+              aliases: [],
+              contains: [],
+              keywords: { keyword: "bravo" },
+            };
+          },
+        },
+      })
       .use(plugin)
       .use(rehypeStringify)
       .process(
         [
           "<h1>Hello World!</h1>",
           "",
-          '<pre><code class="language-scss">test normal text</code></pre>',
+          '<pre><code class="language-test">alpha bravo charlie</code></pre>',
         ].join("\n"),
       );
 
@@ -458,7 +452,7 @@ describe("reyhpe-highlight-code-lines", () => {
       [
         "<h1>Hello World!</h1>",
         "",
-        '<pre><code class="hljs language-scss">test <span class="hljs-attribute">normal</span> <span class="hljs-selector-tag">text</span></code></pre>',
+        '<pre><code class="hljs language-test">alpha <span class="hljs-keyword">bravo</span> charlie</code></pre>',
       ].join("\n"),
     );
   });

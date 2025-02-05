@@ -140,7 +140,6 @@ All options are **optional** and have **default values**.
 ```typescript
 type HighlightLinesOptions = {
   showLineNumbers?: boolean; // default is "false"
-  lineContainerTagName?: "div" | "span"; // default is "span"
 };
 
 use(rehypeHighlightLines, HighlightLinesOptions);
@@ -176,17 +175,17 @@ Sometimes you may want to start the line numbering from a specific number. In th
 
 #### `lineContainerTagName`
 
-It is a **union** type option which is **"div" | "span"** for providing custom HTML tag name for code lines.
+**It is a deprecated option.** Marked as `@deprecated`, will be removed in the next versions.
 
-By default, it is `span` which is **inline** level container. If you set it as `div`, the container will be **block** level, in perspective of CSS.
+It was a **union** type option which was **"div" | "span"** for providing custom HTML tag name for code lines.
+
+By default, it is `span` which is **inline** level container. If you set it as `div`, the container will still be `span` after deprecation.
 
 ```javascript
 use(rehypeHighlightLines, {
-  lineContainerTagName: "div",
+  lineContainerTagName: "div", // @deprecated, always "span"
 });
 ```
-
-Now, the code line container's tag name will be `div`.
 
 ### Examples:
 
@@ -194,10 +193,9 @@ Now, the code line container's tag name will be `div`.
 // line numbering will occur as per directive "showLineNumber" and code-line containers will be <span> inline element
 use(rehypeHighlightLines);
 
-// all code blocks will be numbered and code-line containers will be <div> block element
+// all code blocks will be numbered by default and code-line containers will be <span> inline element
 use(rehypeHighlightLines, {
   showLineNumbers: true,
-  lineContainerTagName: "div",
 });
 ```
 
@@ -209,32 +207,6 @@ use(rehypeHighlightLines, {
 **Here you can find some demo applications below which the `rehype-highlight` and `rehype-highlight-code-lines` are used together:**
 + [demo blog application](https://next-mdx-remote-client-in-app-router.vercel.app/) using `next-mdx-remote-client` within `Next.js app router`
 + [demo blog application](https://next-mdx-remote-client-in-pages-router.vercel.app/) using `next-mdx-remote-client` within `Next.js pages router`
-
-## Copying Code Block's Content Issue
-
-When the line container is "div" block element, the end of line character (eol) at the end of line causes unwanted extra blank line. In order to fix the issue, I've **removed the eol when it is "div", but kept the eol when it is "span"**.
-
-But, **the lack of the eol when "div" causes another issue.** If you implement a button for copying code block content, it doesn't work as expected since all code are printed in a single line. In order to work around the issue, you can implement an `onClick` of the `button` like below:
-
-*I assume you use a `useRef` for `<pre>` element.*
-
-```javascript
-const onClick = () => {
-  if (!preRef.current) return;
-
-  // clone the <code> element in order not to cause any change in actual DOM
-  const code = preRef.current.getElementsByTagName("code")[0].cloneNode(true);
-
-  // add eol to each code-line since there is no eol at the end when they are div
-  Array.from((code as HTMLElement).querySelectorAll("div.code-line")).forEach(
-    (line) => {
-      line.innerHTML = line.innerHTML + "\r";
-    }
-  );
-
-  void navigator.clipboard.writeText(code.textContent ?? "");
-};
-```
 
 ## Styling
 
@@ -275,29 +247,22 @@ pre > code {
 }
 
 .code-line {
+  min-width: 100%;
   padding-left: 12px;
   padding-right: 12px;
   margin-left: -12px;
   margin-right: -12px;
   border-left: 4px solid transparent; /* prepare for highlighted code-lines */
-}
 
-div.code-line:empty {
-  /* it is necessary because there is no even eol character in div code-lines */
-  height: 15.5938px; /* calculated height */
-}
-
-span.code-line {
-  min-width: 100%;
   display: inline-block;
 }
 
 .code-line.inserted {
-  background-color: var(--color-inserted-line); /* inserted code-line (+) color */
+  background-color: var(--color-inserted-line); /* inserted code-line (+) */
 }
 
 .code-line.deleted {
-  background-color: var(--color-deleted-line); /* deleted code-line (-) color */
+  background-color: var(--color-deleted-line); /* deleted code-line (-) */
 }
 
 .highlighted-code-line {

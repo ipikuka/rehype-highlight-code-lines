@@ -9,6 +9,10 @@ type PartiallyRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
 
 export type HighlightLinesOptions = {
   showLineNumbers?: boolean;
+  /**
+   * @deprecated container tag name is always "span"
+   * will be removed in the next versions
+   */
   lineContainerTagName?: "div" | "span";
 };
 
@@ -124,7 +128,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
     return {
       type: "element",
-      tagName: settings.lineContainerTagName,
+      tagName: "span", // now it is always "span"
       children,
       properties: {
         className: clsx([
@@ -204,10 +208,8 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
           );
         }
 
-        // Add eol if the tag name is "span"
-        if (settings.lineContainerTagName === "span") {
-          replacement.push({ type: "text", value: match[0] });
-        }
+        // Add eol
+        replacement.push({ type: "text", value: match[0] });
 
         start = index + 1;
         textStart = match.index + match[0].length;
