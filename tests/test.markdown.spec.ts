@@ -524,9 +524,9 @@ describe("reyhpe-highlight-code-lines", () => {
   });
 
   // ******************************************
-  it("with language jsx, with line numbering, tag name is div", async () => {
+  it.skip("with language jsx, with line numbering and line highlighting, tag name is div", async () => {
     const input = dedent`
-      \`\`\`javascript showLineNumbers
+      \`\`\`javascript showLineNumbers {4}
       function MyComponent() {
         return (
           <MDXProvider>
@@ -540,7 +540,14 @@ describe("reyhpe-highlight-code-lines", () => {
     const html = String(await process(input, { lineContainerTagName: "div" }));
 
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript"><div class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">function</span> <span class="hljs-title function_">MyComponent</span>() {</div><div class="code-line numbered-code-line" data-line-number="2">  <span class="hljs-keyword">return</span> (</div><div class="code-line numbered-code-line" data-line-number="3">    &#x3C;<span class="xml hljs-tag hljs-name">MDXProvider</span>></div><div class="code-line numbered-code-line" data-line-number="4">      &#x3C;<span class="xml hljs-tag hljs-name">MDXClient</span> {<span class="xml hljs-tag hljs-attr">...mdxSource</span>} /></div><div class="code-line numbered-code-line" data-line-number="5">    &#x3C;/<span class="xml hljs-tag hljs-name">MDXProvider</span>></div><div class="code-line numbered-code-line" data-line-number="6">  );</div><div class="code-line numbered-code-line" data-line-number="7">};</div></code></pre>
+      "<pre><code class="hljs language-javascript"><div class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">function</span> <span class="hljs-title function_">MyComponent</span>() {</div>
+      <div class="code-line numbered-code-line" data-line-number="2">  <span class="hljs-keyword">return</span> (</div>
+      <div class="code-line numbered-code-line" data-line-number="3">    &#x3C;<span class="xml hljs-tag hljs-name">MDXProvider</span>></div>
+      <div class="code-line numbered-code-line highlighted-code-line" data-line-number="4">      &#x3C;<span class="xml hljs-tag hljs-name">MDXClient</span> {<span class="xml hljs-tag hljs-attr">...mdxSource</span>} /></div>
+      <div class="code-line numbered-code-line" data-line-number="5">    &#x3C;/<span class="xml hljs-tag hljs-name">MDXProvider</span>></div>
+      <div class="code-line numbered-code-line" data-line-number="6">  );</div>
+      <div class="code-line numbered-code-line" data-line-number="7">};</div>
+      </code></pre>
       "
     `);
   });

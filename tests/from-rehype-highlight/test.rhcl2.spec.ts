@@ -6,7 +6,7 @@ import rehypeStringify from "rehype-stringify";
 import rehypeHighlight from "rehype-highlight";
 import { common, type LanguageFn } from "lowlight";
 
-import plugin from "../src";
+import plugin from "../../src";
 
 // all the test is taken from `rehype-highlight` for reference
 // only added `rehype-highlight-code-lines` to see no change the test results
