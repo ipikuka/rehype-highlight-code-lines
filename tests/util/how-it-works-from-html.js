@@ -4,7 +4,6 @@ import { common, createLowlight } from "lowlight";
 import { visit } from "unist-util-visit";
 import { toText } from "hast-util-to-text";
 import { removePosition } from "unist-util-remove-position";
-import dedent from "dedent";
 
 // How rehype-highligt works !
 
