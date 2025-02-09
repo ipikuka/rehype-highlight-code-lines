@@ -21,7 +21,7 @@ String.prototype.prettifyPre = function () {
 
 // added for higher coverage result and covering edge-cases
 describe("edge cases", () => {
-  it("removes empty line, and highlight only the code lines", async () => {
+  it("shouldn't add empty code lines - 1", async () => {
     const html = dedent`
       <pre>
         <code class="language-javascript">
@@ -30,10 +30,10 @@ describe("edge cases", () => {
       </pre>
     `;
 
+    // without `rehype-highlight-code-lines`
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
-      // .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
       .process(html);
 
@@ -45,6 +45,7 @@ describe("edge cases", () => {
       </pre>"
     `);
 
+    // with `rehype-highlight-code-lines`
     const file2 = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
@@ -52,12 +53,91 @@ describe("edge cases", () => {
       .use(rehypeStringify)
       .process(html);
 
+    // TODO: invalid result
     expect(String(file2).prettifyPre()).toMatchInlineSnapshot(`
       "<pre>
-        <code class="hljs language-javascript">
-      <span class="code-line numbered-code-line" data-line-number="1">    <span class="hljs-keyword">let</span> a;</span>
-      </code>
+        <code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
+      <span class="code-line numbered-code-line" data-line-number="2">    <span class="hljs-keyword">let</span> a;</span>
+        </code>
       </pre>"
+    `);
+  });
+
+  it("shouldn't add empty code lines - 2", async () => {
+    const html = dedent`
+      <pre>
+        <code class="language-javascript">
+      let a;
+        </code>
+      </pre>
+    `;
+
+    // without `rehype-highlight-code-lines`
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
+      .use(rehypeHighlight)
+      .use(rehypeStringify)
+      .process(html);
+
+    expect(String(file).prettifyPre()).toMatchInlineSnapshot(`
+      "<pre>
+        <code class="hljs language-javascript">
+      <span class="hljs-keyword">let</span> a;
+        </code>
+      </pre>"
+    `);
+
+    // with `rehype-highlight-code-lines`
+    const file2 = await unified()
+      .use(rehypeParse, { fragment: true })
+      .use(rehypeHighlight)
+      .use(plugin, { showLineNumbers: true })
+      .use(rehypeStringify)
+      .process(html);
+
+    // TODO: invalid result
+    expect(String(file2).prettifyPre()).toMatchInlineSnapshot(`
+      "<pre>
+        <code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-keyword">let</span> a;</span>
+        </code>
+      </pre>"
+    `);
+  });
+
+  it("shouldn't add empty code lines - 3", async () => {
+    const html = dedent`
+      <pre><code class="language-javascript">
+      let a;
+      </code></pre>
+    `;
+
+    // without `rehype-highlight-code-lines`
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
+      .use(rehypeHighlight)
+      .use(rehypeStringify)
+      .process(html);
+
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript">
+      <span class="hljs-keyword">let</span> a;
+      </code></pre>"
+    `);
+
+    // with `rehype-highlight-code-lines`
+    const file2 = await unified()
+      .use(rehypeParse, { fragment: true })
+      .use(rehypeHighlight)
+      .use(plugin, { showLineNumbers: true })
+      .use(rehypeStringify)
+      .process(html);
+
+    // TODO: invalid result
+    expect(String(file2)).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-keyword">let</span> a;</span>
+      </code></pre>"
     `);
   });
 

@@ -1,4 +1,5 @@
-import { fromHtml } from "hast-util-from-html";
+import { fromMarkdown } from "mdast-util-from-markdown";
+import { toHast } from "mdast-util-to-hast";
 import { toHtml } from "hast-util-to-html";
 import { common, createLowlight } from "lowlight";
 import { visit } from "unist-util-visit";
@@ -16,26 +17,31 @@ String.prototype.prettifyPre = function () {
 const lowlight = createLowlight(common);
 
 // input
-const html_input = dedent`
-  <pre>
-    <code>
-      let a;
-      let b;
-    </code>
-  </pre>
+const markdown_input = dedent`
+\`\`\`javascript
+
+
+"use strict";
+      
+console.log("xxx");
+
+
+\`\`\`
 `;
 
-console.log(html_input);
+console.log(markdown_input);
 
 // HAST
-const tree = fromHtml(html_input, { fragment: true });
+const mdastTree = fromMarkdown(markdown_input);
+const hastTree = toHast(mdastTree);
 
-removePosition(tree, { force: true });
-console.dir(tree, { depth: null });
+removePosition(hastTree, { force: true });
+console.dir(hastTree, { depth: null });
 
-visit(tree, (node, index, parent) => {
+visit(hastTree, (node, index, parent) => {
   if (parent && typeof index === "number" && node.tagName === "code") {
     const text = toText(node, { whitespace: "pre" });
+    console.log({ text });
     const highlighted = lowlight.highlight("javascript", text);
     console.dir(highlighted, { depth: null });
     node.children = structuredClone(highlighted.children);
@@ -43,10 +49,10 @@ visit(tree, (node, index, parent) => {
   }
 });
 
-removePosition(tree, { force: true });
-console.dir(tree, { depth: null });
+removePosition(hastTree, { force: true });
+console.dir(hastTree, { depth: null });
 
 // output
-const html_output = String(toHtml(tree)).prettifyPre();
+const markdown_output = String(toHtml(hastTree)).prettifyPre();
 
-console.log(html_output);
+console.log(markdown_output);

@@ -729,3 +729,246 @@ describe("reyhpe-highlight-code-lines, and line numbering (via settings)", () =>
     `);
   });
 });
+
+describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
+  // ******************************************
+  it("inside extra blank lines - 11", async () => {
+    const input = dedent`
+      \`\`\`javascript
+
+      "use strict";
+      
+      console.log("xxx");
+
+      \`\`\`
+    `;
+
+    // the code value, for reference
+    // '\n"use strict";\n\nconsole.log("xxx");\n\n'
+    // ['\n"use strict"', ';\n\n', 'console', '.', 'log', '(', '"xxx"', ');\n\n']
+
+    const html1 = String(await process(input));
+
+    expect(html1).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="hljs-meta">
+      "use strict"</span>;
+
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);
+
+      </code></pre>"
+    `);
+
+    const html2 = String(await process(input, { showLineNumbers: true }));
+
+    expect(html2).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-meta">"use strict"</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="3"></span>
+      <span class="code-line numbered-code-line" data-line-number="4"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      <span class="code-line numbered-code-line" data-line-number="5"></span>
+      </code></pre>"
+    `);
+  });
+
+  // ******************************************
+  it("inside extra blank lines - 12", async () => {
+    const input = dedent`
+      \`\`\`javascript
+
+
+      "use strict";
+      
+      console.log("xxx");
+
+
+      \`\`\`
+    `;
+
+    const html1 = String(await process(input));
+
+    expect(html1).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="hljs-meta">
+
+      "use strict"</span>;
+
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);
+
+
+      </code></pre>"
+    `);
+
+    const html2 = String(await process(input, { showLineNumbers: true }));
+
+    expect(html2).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
+      <span class="code-line numbered-code-line" data-line-number="2"></span>
+      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-meta">"use strict"</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="4"></span>
+      <span class="code-line numbered-code-line" data-line-number="5"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      <span class="code-line numbered-code-line" data-line-number="6"></span>
+      <span class="code-line numbered-code-line" data-line-number="7"></span>
+      </code></pre>"
+    `);
+  });
+
+  // ******************************************
+  it("inside extra blank lines - 21", async () => {
+    const input = dedent`
+      \`\`\`javascript
+
+      console.log("xxx");
+
+      let a = 1;
+      
+      \`\`\`
+    `;
+
+    const html1 = String(await process(input));
+
+    expect(html1).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript">
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);
+
+      <span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;
+
+      </code></pre>"
+    `);
+
+    const html2 = String(await process(input, { showLineNumbers: true }));
+
+    expect(html2).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      <span class="code-line numbered-code-line" data-line-number="3"></span>
+      <span class="code-line numbered-code-line" data-line-number="4"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="5"></span>
+      </code></pre>"
+    `);
+  });
+
+  // ******************************************
+  it("inside extra blank lines - 22", async () => {
+    const input = dedent`
+      \`\`\`javascript
+
+
+      let a = 1;
+      
+      console.log("xxx");
+
+
+      \`\`\`
+    `;
+
+    const html1 = String(await process(input));
+
+    expect(html1).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript">
+
+      <span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;
+
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);
+
+
+      </code></pre>"
+    `);
+
+    const html2 = String(await process(input, { showLineNumbers: true }));
+
+    expect(html2).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
+      <span class="code-line numbered-code-line" data-line-number="2"></span>
+      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="4"></span>
+      <span class="code-line numbered-code-line" data-line-number="5"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      <span class="code-line numbered-code-line" data-line-number="6"></span>
+      <span class="code-line numbered-code-line" data-line-number="7"></span>
+      </code></pre>"
+    `);
+  });
+
+  // ******************************************
+  it("inside extra blank lines - 31, double comments", async () => {
+    const input = dedent`
+      \`\`\`javascript
+
+      // comment 1
+      // comment 2
+
+      let a = 1;
+      
+      \`\`\`
+    `;
+
+    const html1 = String(await process(input));
+
+    expect(html1).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript">
+      <span class="hljs-comment">// comment 1</span>
+      <span class="hljs-comment">// comment 2</span>
+
+      <span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;
+
+      </code></pre>"
+    `);
+
+    const html2 = String(await process(input, { showLineNumbers: true }));
+
+    expect(html2).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-comment">// comment 1</span></span>
+      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-comment">// comment 2</span></span>
+      <span class="code-line numbered-code-line" data-line-number="4"></span>
+      <span class="code-line numbered-code-line" data-line-number="5"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="6"></span>
+      </code></pre>"
+    `);
+  });
+
+  // ******************************************
+  it("inside extra blank lines - 32, multiline comment", async () => {
+    const input = dedent`
+      \`\`\`javascript
+
+
+      /**
+       * comment1
+       */
+      
+      console.log("xxx");
+
+
+      \`\`\`
+    `;
+
+    const html1 = String(await process(input));
+
+    expect(html1).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript">
+
+      <span class="hljs-comment">/**
+       * comment1
+       */</span>
+
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);
+
+
+      </code></pre>"
+    `);
+
+    const html2 = String(await process(input, { showLineNumbers: true }));
+
+    expect(html2).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
+      <span class="code-line numbered-code-line" data-line-number="2"></span>
+      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-comment">/**</span></span>
+      <span class="code-line numbered-code-line" data-line-number="4"><span class="hljs-comment"> * comment1</span></span>
+      <span class="code-line numbered-code-line" data-line-number="5"><span class="hljs-comment"> */</span></span>
+      <span class="code-line numbered-code-line" data-line-number="6"></span>
+      <span class="code-line numbered-code-line" data-line-number="7"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      <span class="code-line numbered-code-line" data-line-number="8"></span>
+      <span class="code-line numbered-code-line" data-line-number="9"></span>
+      </code></pre>"
+    `);
+  });
+});
