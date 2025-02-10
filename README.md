@@ -140,6 +140,8 @@ All options are **optional** and have **default values**.
 ```typescript
 type HighlightLinesOptions = {
   showLineNumbers?: boolean; // default is "false"
+  lineContainerTagName?: "span" | "div"; // deprecated, always span
+  trimBlankLines?: boolean; // default is "false"
 };
 
 use(rehypeHighlightLines, HighlightLinesOptions);
@@ -173,19 +175,52 @@ Sometimes you may want to start the line numbering from a specific number. In th
 
 **\`\`\`showLineNumbers=8**
 
-#### `lineContainerTagName`
+#### `lineContainerTagName` (Deprecated)
 
-**It is a deprecated option.** Marked as `@deprecated`, will be removed in the next versions.
+**It is marked as `@deprecated` and will be removed in the next versions.
 
-It was a **union** type option which was **"div" | "span"** for providing custom HTML tag name for code lines.
+It was a **union** option which was **"div" | "span"** for providing custom HTML tag name for code lines.
 
 By default, it is `span` which is **inline** level container. If you set it as `div`, the container will still be `span` after deprecation.
 
 ```javascript
 use(rehypeHighlightLines, {
-  lineContainerTagName: "div", // @deprecated, always "span"
+  lineContainerTagName: "div", // @deprecated, effectless, always "span"
 });
 ```
+
+#### `trimBlankLines`
+
+It is a **boolean** option. It is designed to delete one blank/empty line at the beginning and one at the end of the code block, if happened due to html parsing `<pre><code /></pre>`.
+
+By default, it is `false`.
+
+Let's assume you want to highlight `pre`, and `code` element in markdown (not code fence).
+
+```markdown
+Here is markdown content
+
+<pre><code class="language-javascript">
+console.log("rehype-highlight-code-lines");
+</code></pre>
+```
+
+For above markdown, the parsed result (for example via `rehype-parse` and `rehype-stringfy`) is going to contain empty/blank code lines due to nature of `pre` preserving whitespaces. In order to prevent having unintentionally blank lines, use the option `trimBlankLines`.
+
+```javascript
+use(rehypeHighlightLines, {
+  trimBlankLines: true,
+});
+```
+
+Actually, the trimming could have been the default behaviour. However, some developers may intentionally include empty lines at the beginning and at the end in code fences for specific reasons and may want to preserve them.
+````markdown
+```javascript
+
+console.log("rehype-highlight-code-lines");
+
+```
+````
 
 ### Examples:
 

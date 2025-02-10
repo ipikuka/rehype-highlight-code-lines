@@ -24,16 +24,24 @@ export type HighlightLinesOptions = {
    * will be removed in the next versions
    */
   lineContainerTagName?: "div" | "span";
+  trimBlankLines?: boolean;
 };
 
 const DEFAULT_SETTINGS: HighlightLinesOptions = {
   showLineNumbers: false,
   lineContainerTagName: "span",
+  trimBlankLines: false,
 };
 
 type PartiallyRequiredHighlightLinesOptions = Prettify<
   PartiallyRequired<HighlightLinesOptions, "showLineNumbers" | "lineContainerTagName">
 >;
+
+type GutterOptions = {
+  directiveShowLineNumbers: boolean | number;
+  directiveHighlightLines: number[];
+  directiveTrimBlankLines: boolean;
+};
 
 // a simple util for our use case, like clsx package
 export function clsx(arr: (string | false | null | undefined | 0)[]): string[] {
@@ -65,7 +73,7 @@ function hasClassName(node: ElementContent | undefined, className: string): bool
 
 // match all common types of line breaks
 const REGEX_LINE_BREAKS = /\r?\n|\r/g;
-const REGEX_LINE_BREAKS_IN_THE_BEGINNING = /^(\r?\n|\r)/;
+const REGEX_LINE_BREAKS_IN_THE_BEGINNING = /^(\r?\n|\r)+/;
 
 /**
  *
@@ -213,39 +221,36 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
    *
    */
   function handleFirstElementContent(code: Element): undefined {
-    const replacement: ElementContent[] = [];
-
     const elementNode = code.children[0];
     if (!isElementWithTextNode(elementNode)) return;
 
     const textNode = elementNode.children[0];
     if (!REGEX_LINE_BREAKS_IN_THE_BEGINNING.test(textNode.value)) return;
 
-    let match = REGEX_LINE_BREAKS_IN_THE_BEGINNING.exec(textNode.value);
+    const match = REGEX_LINE_BREAKS_IN_THE_BEGINNING.exec(textNode.value);
 
-    while (match !== null) {
-      replacement.push({ type: "text", value: match[0] });
+    if (match) {
+      code.children.unshift({ type: "text", value: match[0] });
 
-      // Update the child value
-      textNode.value = textNode.value.slice(1);
-
-      // iterate the match
-      match = REGEX_LINE_BREAKS_IN_THE_BEGINNING.exec(textNode.value);
+      textNode.value = textNode.value.replace(REGEX_LINE_BREAKS_IN_THE_BEGINNING, "");
     }
-
-    code.children.unshift(...replacement);
   }
 
   /**
    *
-   * check the code line is empty or with value only spaces
+   * handle trimming blank line for the last text node
    *
    */
-  function isEmptyLine(line: ElementContent[]): boolean {
-    return (
-      line.length === 0 ||
-      (line.length === 1 && line[0].type === "text" && line[0].value.trim() === "")
-    );
+  function handleTrimmingBlankLines(code: Element, directiveTrimBlankLines: boolean) {
+    if (!directiveTrimBlankLines) return;
+
+    const lastChild = code.children[code.children.length - 1];
+
+    if (lastChild.type === "text") {
+      if (/(\r?\n|\r)(\1)$/.test(lastChild.value)) {
+        lastChild.value = lastChild.value.replace(/(\r?\n|\r)(\1)$/, "$1");
+      }
+    }
   }
 
   /**
@@ -259,16 +264,16 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
     {
       directiveShowLineNumbers,
       directiveHighlightLines,
-    }: {
-      directiveShowLineNumbers: boolean | number;
-      directiveHighlightLines: number[];
-    },
+      directiveTrimBlankLines,
+    }: GutterOptions,
   ) {
     hasFlatteningNeed(code) && flattenCodeTree(code); // mutates the code
 
     handleMultiLineComments(code); // mutates the code
 
     handleFirstElementContent(code); // mutates the code
+
+    handleTrimmingBlankLines(code, directiveTrimBlankLines);
 
     const replacement: ElementContent[] = [];
 
@@ -279,18 +284,13 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
     for (let index = 0; index < code.children.length; index++) {
       const child = code.children[index];
 
-      // if (index === 0 && /^[\n][\s]*$/.test(child.value)) {
-      //   console.log(child.value, index);
-      // }
-
       if (child.type !== "text") continue;
 
       let textStart = 0;
-      let match = REGEX_LINE_BREAKS.exec(child.value);
 
-      while (match !== null) {
-        // Nodes in this line. (current child is exclusive)
-        // Array.prototype.slice() start to end (end not included)
+      const matches = Array.from(child.value.matchAll(REGEX_LINE_BREAKS));
+      matches.forEach((match, iteration) => {
+        // Nodes in this line. (current child (index) is exclusive)
         const line = code.children.slice(start, index);
 
         // Prepend text from a partial matched earlier text.
@@ -305,18 +305,21 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
           line.push({ type: "text", value });
         }
 
-        lineNumber += 1;
-        replacement.push(
-          createLine(line, lineNumber, directiveShowLineNumbers, directiveHighlightLines),
-          { type: "text", value: match[0] }, // eol
-        );
+        const isFirstIteration = index === 0 && iteration === 0;
+
+        if (isFirstIteration && directiveTrimBlankLines && line.length === 0) {
+          replacement.push({ type: "text", value: match[0] }); // eol
+        } else {
+          lineNumber += 1;
+          replacement.push(
+            createLine(line, lineNumber, directiveShowLineNumbers, directiveHighlightLines),
+            { type: "text", value: match[0] }, // eol
+          );
+        }
 
         start = index + 1;
         textStart = match.index + match[0].length;
-
-        // iterate the match
-        match = REGEX_LINE_BREAKS.exec(child.value);
-      }
+      });
 
       // If we matched, make sure to not drop the text after the last line ending.
       if (start === index + 1) {
@@ -333,14 +336,11 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
     }
 
     if (line.length > 0) {
-      if (isEmptyLine(line)) {
-        replacement.push(...line);
-      } else {
-        lineNumber += 1;
-        replacement.push(
-          createLine(line, lineNumber, directiveShowLineNumbers, directiveHighlightLines),
-        );
-      }
+      directiveTrimBlankLines
+        ? replacement.push(...line)
+        : replacement.push(
+            createLine(line, ++lineNumber, directiveShowLineNumbers, directiveHighlightLines),
+          );
     }
 
     // Replace children with new array.
@@ -401,7 +401,8 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       if (
         language?.startsWith("{") ||
         language?.startsWith("showlinenumbers") ||
-        language?.startsWith("nolinenumbers")
+        language?.startsWith("nolinenumbers") ||
+        language?.startsWith("trimblanklines")
       ) {
         // add specifiers to meta
         meta = (language + " " + meta).trim();
@@ -427,8 +428,16 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       const strLineNumbers = REGEX2.exec(meta)?.groups?.lines?.replace(/\s/g, "");
       const directiveHighlightLines = strLineNumbers ? rangeParser(strLineNumbers) : [];
 
+      // find the directive for trimming blank lines
+      const REGEX3 = /trimblanklines/i;
+      const directiveTrimBlankLines = settings.trimBlankLines || REGEX3.test(meta);
+
       // if nothing to do for numbering, highlihting or trimming blank lines, just return;
-      if (directiveShowLineNumbers === false && directiveHighlightLines.length === 0) {
+      if (
+        directiveShowLineNumbers === false &&
+        directiveHighlightLines.length === 0 &&
+        directiveTrimBlankLines === false
+      ) {
         return;
       }
 
@@ -436,6 +445,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       gutter(code, {
         directiveShowLineNumbers,
         directiveHighlightLines,
+        directiveTrimBlankLines,
       });
     });
   };
