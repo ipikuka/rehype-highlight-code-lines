@@ -9,6 +9,8 @@ describe("reyhpe-highlight-code-lines", () => {
   it("effectless for inline codes", async () => {
     const html = String(await process("`Hi`"));
 
+    expect(html).toMatchInlineSnapshot(`"<p><code>Hi</code></p>"`);
+
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<p>
         <code>Hi</code>
@@ -29,6 +31,13 @@ describe("reyhpe-highlight-code-lines", () => {
 
     const html = String(await process(input));
 
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code>const a1=1;
+      const a2=2;
+      const a3=3;
+      </code></pre>"
+    `);
+
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code>const a1=1; const a2=2; const a3=3;</code>
@@ -48,6 +57,13 @@ describe("reyhpe-highlight-code-lines", () => {
     `;
 
     const html = String(await process(input));
+
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;
+      <span class="hljs-keyword">const</span> a2=<span class="hljs-number">2</span>;
+      <span class="hljs-keyword">const</span> a3=<span class="hljs-number">3</span>;
+      </code></pre>"
+    `);
 
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
@@ -74,6 +90,13 @@ describe("reyhpe-highlight-code-lines", () => {
     `;
 
     const html = String(await process(input));
+
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-keyword">const</span> a2=<span class="hljs-number">2</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-keyword">const</span> a3=<span class="hljs-number">3</span>;</span>
+      </code></pre>"
+    `);
 
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
@@ -108,6 +131,13 @@ describe("reyhpe-highlight-code-lines", () => {
 
     const html = String(await process(input));
 
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;</span>
+      <span class="code-line highlighted-code-line"><span class="hljs-keyword">const</span> a2=<span class="hljs-number">2</span>;</span>
+      <span class="code-line"><span class="hljs-keyword">const</span> a3=<span class="hljs-number">3</span>;</span>
+      </code></pre>"
+    `);
+
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
@@ -140,6 +170,13 @@ describe("reyhpe-highlight-code-lines", () => {
     `;
 
     const html = String(await process(input));
+
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;</span>
+      <span class="code-line numbered-code-line highlighted-code-line" data-line-number="2"><span class="hljs-keyword">const</span> a2=<span class="hljs-number">2</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-keyword">const</span> a3=<span class="hljs-number">3</span>;</span>
+      </code></pre>"
+    `);
 
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
@@ -177,6 +214,13 @@ describe("reyhpe-highlight-code-lines", () => {
 
     const html = String(await process(input, { lineContainerTagName: "div" }));
 
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;</span>
+      <span class="code-line numbered-code-line highlighted-code-line" data-line-number="2"><span class="hljs-keyword">const</span> a2=<span class="hljs-number">2</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-keyword">const</span> a3=<span class="hljs-number">3</span>;</span>
+      </code></pre>"
+    `);
+
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
@@ -213,6 +257,13 @@ describe("reyhpe-highlight-code-lines", () => {
 
     const html = String(await process(input));
 
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="11"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="12"><span class="hljs-keyword">const</span> a2=<span class="hljs-number">2</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="13"><span class="hljs-keyword">const</span> a3=<span class="hljs-number">3</span>;</span>
+      </code></pre>"
+    `);
+
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
@@ -245,6 +296,13 @@ describe("reyhpe-highlight-code-lines", () => {
     `;
 
     const html = String(await process(input));
+
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="11"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;</span>
+      <span class="code-line numbered-code-line highlighted-code-line" data-line-number="12"><span class="hljs-keyword">const</span> a2=<span class="hljs-number">2</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="13"><span class="hljs-keyword">const</span> a3=<span class="hljs-number">3</span>;</span>
+      </code></pre>"
+    `);
 
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
@@ -282,6 +340,13 @@ describe("reyhpe-highlight-code-lines", () => {
 
     const html = String(await process(input));
 
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code><span class="code-line numbered-code-line" data-line-number="1">const a1=1;</span>
+      <span class="code-line numbered-code-line highlighted-code-line" data-line-number="2">const a2=2;</span>
+      <span class="code-line numbered-code-line" data-line-number="3">const a3=3;</span>
+      </code></pre>"
+    `);
+
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code>
@@ -314,6 +379,13 @@ describe("reyhpe-highlight-code-lines", () => {
     `;
 
     const html = String(await process(input));
+
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code><span class="code-line numbered-code-line" data-line-number="1">const a1=1;</span>
+      <span class="code-line numbered-code-line highlighted-code-line" data-line-number="2">const a2=2;</span>
+      <span class="code-line numbered-code-line" data-line-number="3">const a3=3;</span>
+      </code></pre>"
+    `);
 
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
@@ -348,6 +420,13 @@ describe("reyhpe-highlight-code-lines", () => {
 
     const html = String(await process(input));
 
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code><span class="code-line numbered-code-line" data-line-number="1">const a1=1;</span>
+      <span class="code-line numbered-code-line" data-line-number="2">const a2=2;</span>
+      <span class="code-line numbered-code-line" data-line-number="3">const a3=3;</span>
+      </code></pre>"
+    `);
+
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code>
@@ -378,6 +457,13 @@ describe("reyhpe-highlight-code-lines", () => {
 
     const html = String(await process(input));
 
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code><span class="code-line">const a1=1;</span>
+      <span class="code-line highlighted-code-line">const a2=2;</span>
+      <span class="code-line">const a3=3;</span>
+      </code></pre>"
+    `);
+
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code>
@@ -400,6 +486,11 @@ describe("reyhpe-highlight-code-lines", () => {
 
     const html = String(await process(input));
 
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code>console.log("ipikuka");
+      </code></pre>"
+    `);
+
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code>console.log("ipikuka");</code>
@@ -418,6 +509,11 @@ describe("reyhpe-highlight-code-lines", () => {
 
     const html = String(await process(input));
 
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"ipikuka"</span>);
+      </code></pre>"
+    `);
+
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-js">
@@ -433,7 +529,7 @@ describe("reyhpe-highlight-code-lines", () => {
   // ******************************************
   it("with language jsx", async () => {
     const input = dedent`
-      \`\`\`javascript
+      \`\`\`jsx
       function MyComponent() {
         return (
           <MDXClient
@@ -447,8 +543,20 @@ describe("reyhpe-highlight-code-lines", () => {
 
     const html = String(await process(input));
 
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-jsx"><span class="hljs-keyword">function</span> <span class="hljs-title function_">MyComponent</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-keyword">return</span> (
+          <span class="xml"><span class="hljs-tag">&#x3C;<span class="hljs-name">MDXClient</span>
+            {<span class="hljs-attr">...mdxSource</span>}
+            <span class="hljs-attr">components</span>=<span class="hljs-string">{components}</span>
+          /></span></span>
+        );
+      };
+      </code></pre>"
+    `);
+
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">MyComponent</span>(<span class="hljs-params"></span>) {
+      "<pre><code class="hljs language-jsx"><span class="hljs-keyword">function</span> <span class="hljs-title function_">MyComponent</span>(<span class="hljs-params"></span>) {
         <span class="hljs-keyword">return</span> (
           <span class="xml"><span class="hljs-tag">&#x3C;<span class="hljs-name">MDXClient</span>
             {<span class="hljs-attr">...mdxSource</span>}
@@ -464,7 +572,7 @@ describe("reyhpe-highlight-code-lines", () => {
   // ******************************************
   it.skip("with language jsx, after flattened, for reference, fake test", async () => {
     const input = dedent`
-      \`\`\`javascript
+      \`\`\`jsx
       function MyComponent() {
         return (
           <MDXClient
@@ -479,7 +587,7 @@ describe("reyhpe-highlight-code-lines", () => {
     const html = String(await process(input));
 
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">MyComponent</span>() {
+      "<pre><code class="hljs language-jsx"><span class="hljs-keyword">function</span> <span class="hljs-title function_">MyComponent</span>() {
         <span class="hljs-keyword">return</span> (
           &#x3C;<span class="xml hljs-tag hljs-name">MDXClient</span>
             {<span class="xml hljs-tag hljs-attr">...mdxSource</span>}
@@ -495,7 +603,7 @@ describe("reyhpe-highlight-code-lines", () => {
   // ******************************************
   it("with language jsx, with line numbering and line highlighting", async () => {
     const input = dedent`
-      \`\`\`javascript showLineNumbers {4}
+      \`\`\`jsx showLineNumbers {4}
       function MyComponent() {
         return (
           <MDXClient
@@ -509,8 +617,20 @@ describe("reyhpe-highlight-code-lines", () => {
 
     const html = String(await process(input));
 
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-jsx"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">function</span> <span class="hljs-title function_">MyComponent</span>() {</span>
+      <span class="code-line numbered-code-line" data-line-number="2">  <span class="hljs-keyword">return</span> (</span>
+      <span class="code-line numbered-code-line" data-line-number="3">    &#x3C;<span class="xml hljs-tag hljs-name">MDXClient</span></span>
+      <span class="code-line numbered-code-line highlighted-code-line" data-line-number="4">      {<span class="xml hljs-tag hljs-attr">...mdxSource</span>}</span>
+      <span class="code-line numbered-code-line" data-line-number="5">      <span class="xml hljs-tag hljs-attr">components</span>=<span class="xml hljs-tag hljs-string">{components}</span></span>
+      <span class="code-line numbered-code-line" data-line-number="6">    /></span>
+      <span class="code-line numbered-code-line" data-line-number="7">  );</span>
+      <span class="code-line numbered-code-line" data-line-number="8">};</span>
+      </code></pre>"
+    `);
+
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">function</span> <span class="hljs-title function_">MyComponent</span>() {</span>
+      "<pre><code class="hljs language-jsx"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">function</span> <span class="hljs-title function_">MyComponent</span>() {</span>
       <span class="code-line numbered-code-line" data-line-number="2">  <span class="hljs-keyword">return</span> (</span>
       <span class="code-line numbered-code-line" data-line-number="3">    &#x3C;<span class="xml hljs-tag hljs-name">MDXClient</span></span>
       <span class="code-line numbered-code-line highlighted-code-line" data-line-number="4">      {<span class="xml hljs-tag hljs-attr">...mdxSource</span>}</span>
@@ -533,6 +653,12 @@ describe("reyhpe-highlight-code-lines", () => {
     `;
 
     const html = String(await process(input));
+
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-diff"><span class="code-line numbered-code-line inserted" data-line-number="1"><span class="hljs-addition">+ const a1=1;</span></span>
+      <span class="code-line numbered-code-line deleted" data-line-number="2"><span class="hljs-deletion">- const a2=2;</span></span>
+      </code></pre>"
+    `);
 
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
@@ -563,6 +689,13 @@ describe("reyhpe-highlight-code-lines, and line numbering (via settings)", () =>
 
     const html = String(await process(input, { showLineNumbers: true }));
 
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code><span class="code-line numbered-code-line" data-line-number="1">const a1=1;</span>
+      <span class="code-line numbered-code-line" data-line-number="2">const a2=2;</span>
+      <span class="code-line numbered-code-line" data-line-number="3">const a3=3;</span>
+      </code></pre>"
+    `);
+
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code>
@@ -592,6 +725,13 @@ describe("reyhpe-highlight-code-lines, and line numbering (via settings)", () =>
     `;
 
     const html = String(await process(input, { showLineNumbers: true }));
+
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-keyword">const</span> a2=<span class="hljs-number">2</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-keyword">const</span> a3=<span class="hljs-number">3</span>;</span>
+      </code></pre>"
+    `);
 
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
@@ -625,6 +765,13 @@ describe("reyhpe-highlight-code-lines, and line numbering (via settings)", () =>
     `;
 
     const html = String(await process(input, { showLineNumbers: true }));
+
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;</span>
+      <span class="code-line numbered-code-line highlighted-code-line" data-line-number="2"><span class="hljs-keyword">const</span> a2=<span class="hljs-number">2</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-keyword">const</span> a3=<span class="hljs-number">3</span>;</span>
+      </code></pre>"
+    `);
 
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
@@ -662,6 +809,13 @@ describe("reyhpe-highlight-code-lines, and line numbering (via settings)", () =>
 
     const html = String(await process(input, { showLineNumbers: true }));
 
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;
+      <span class="hljs-keyword">const</span> a2=<span class="hljs-number">2</span>;
+      <span class="hljs-keyword">const</span> a3=<span class="hljs-number">3</span>;
+      </code></pre>"
+    `);
+
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
@@ -687,6 +841,13 @@ describe("reyhpe-highlight-code-lines, and line numbering (via settings)", () =>
     `;
 
     const html = String(await process(input, { showLineNumbers: true }));
+
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;</span>
+      <span class="code-line highlighted-code-line"><span class="hljs-keyword">const</span> a2=<span class="hljs-number">2</span>;</span>
+      <span class="code-line"><span class="hljs-keyword">const</span> a3=<span class="hljs-number">3</span>;</span>
+      </code></pre>"
+    `);
 
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
@@ -721,9 +882,157 @@ describe("reyhpe-highlight-code-lines, and line numbering (via settings)", () =>
 
     const html = String(await process(input, { showLineNumbers: true }));
 
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code>const a1=1;
+      const a2=2;
+      const a3=3;
+      </code></pre>"
+    `);
+
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code>const a1=1; const a2=2; const a3=3;</code>
+      </pre>
+      "
+    `);
+  });
+
+  // ******************************************
+  it("without language, with only noLineNumbers", async () => {
+    const input = dedent`
+      \`\`\`noLineNumbers
+      const a1=1;
+      const a2=2;
+      const a3=3;
+      \`\`\`
+    `;
+
+    const html = String(await process(input));
+
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code>const a1=1;
+      const a2=2;
+      const a3=3;
+      </code></pre>"
+    `);
+
+    expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
+      "<pre>
+        <code>const a1=1; const a2=2; const a3=3;</code>
+      </pre>
+      "
+    `);
+  });
+
+  // ******************************************
+  it("without language, with only trimBlankLines", async () => {
+    const input = dedent`
+      \`\`\`trimBlankLines
+      const a1=1;
+      const a2=2;
+      const a3=3;
+      \`\`\`
+    `;
+
+    const html = String(await process(input));
+
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code><span class="code-line">const a1=1;</span>
+      <span class="code-line">const a2=2;</span>
+      <span class="code-line">const a3=3;</span>
+      </code></pre>"
+    `);
+
+    expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
+      "<pre>
+        <code>
+          <span class="code-line">const a1=1;</span>
+          <span class="code-line">const a2=2;</span>
+          <span class="code-line">const a3=3;</span>
+        </code>
+      </pre>
+      "
+    `);
+  });
+
+  // ******************************************
+  it("with language, with only trimBlankLines", async () => {
+    const input = dedent`
+      \`\`\`javascript trimBlankLines
+      const a1=1;
+      const a2=2;
+      const a3=3;
+      \`\`\`
+    `;
+
+    const html = String(await process(input));
+
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;</span>
+      <span class="code-line"><span class="hljs-keyword">const</span> a2=<span class="hljs-number">2</span>;</span>
+      <span class="code-line"><span class="hljs-keyword">const</span> a3=<span class="hljs-number">3</span>;</span>
+      </code></pre>"
+    `);
+
+    expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
+      "<pre>
+        <code class="hljs language-javascript">
+          <span class="code-line">
+            <span class="hljs-keyword">const</span> a1=
+            <span class="hljs-number">1</span>;
+          </span>
+          <span class="code-line">
+            <span class="hljs-keyword">const</span> a2=
+            <span class="hljs-number">2</span>;
+          </span>
+          <span class="code-line">
+            <span class="hljs-keyword">const</span> a3=
+            <span class="hljs-number">3</span>;
+          </span>
+        </code>
+      </pre>
+      "
+    `);
+  });
+
+  // ******************************************
+  it("with language, with trimBlankLines and with line numbering and line highlighting", async () => {
+    const input = dedent`
+      \`\`\`javascript trimBlankLines showLineNumbers {2}
+      const a1=1;
+      const a2=2;
+      const a3=3;
+      \`\`\`
+    `;
+
+    const html = String(await process(input));
+
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;</span>
+      <span class="code-line numbered-code-line highlighted-code-line" data-line-number="2"><span class="hljs-keyword">const</span> a2=<span class="hljs-number">2</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-keyword">const</span> a3=<span class="hljs-number">3</span>;</span>
+      </code></pre>"
+    `);
+
+    expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
+      "<pre>
+        <code class="hljs language-javascript">
+          <span class="code-line numbered-code-line" data-line-number="1">
+            <span class="hljs-keyword">const</span> a1=
+            <span class="hljs-number">1</span>;
+          </span>
+          <span
+            class="code-line numbered-code-line highlighted-code-line"
+            data-line-number="2"
+          >
+            <span class="hljs-keyword">const</span> a2=
+            <span class="hljs-number">2</span>;
+          </span>
+          <span class="code-line numbered-code-line" data-line-number="3">
+            <span class="hljs-keyword">const</span> a3=
+            <span class="hljs-number">3</span>;
+          </span>
+        </code>
       </pre>
       "
     `);
@@ -742,10 +1051,6 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
 
       \`\`\`
     `;
-
-    // the code value, for reference
-    // '\n"use strict";\n\nconsole.log("xxx");\n\n'
-    // ['\n"use strict"', ';\n\n', 'console', '.', 'log', '(', '"xxx"', ');\n\n']
 
     const html1 = String(await process(input));
 
@@ -766,6 +1071,16 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       <span class="code-line numbered-code-line" data-line-number="3"></span>
       <span class="code-line numbered-code-line" data-line-number="4"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
       <span class="code-line numbered-code-line" data-line-number="5"></span>
+      </code></pre>"
+    `);
+
+    const html3 = String(await process(input, { showLineNumbers: true, trimBlankLines: true }));
+
+    expect(html3).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript">
+      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-meta">"use strict"</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="2"></span>
+      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
       </code></pre>"
     `);
   });
@@ -809,6 +1124,51 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       <span class="code-line numbered-code-line" data-line-number="7"></span>
       </code></pre>"
     `);
+
+    const html3 = String(await process(input, { showLineNumbers: true, trimBlankLines: true }));
+
+    expect(html3).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript">
+      <span class="code-line numbered-code-line" data-line-number="1"></span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-meta">"use strict"</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="3"></span>
+      <span class="code-line numbered-code-line" data-line-number="4"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      <span class="code-line numbered-code-line" data-line-number="5"></span>
+      </code></pre>"
+    `);
+  });
+
+  // ******************************************
+  it("inside extra blank lines - 13", async () => {
+    const input = dedent`
+      \`\`\`javascript trimBlankLines
+
+      "use strict";
+
+      console.log("xxx");
+
+      \`\`\`
+    `;
+
+    const html1 = String(await process(input));
+
+    expect(html1).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript">
+      <span class="code-line"><span class="hljs-meta">"use strict"</span>;</span>
+      <span class="code-line"></span>
+      <span class="code-line"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      </code></pre>"
+    `);
+
+    const html2 = String(await process(input, { showLineNumbers: true }));
+
+    expect(html2).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript">
+      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-meta">"use strict"</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="2"></span>
+      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      </code></pre>"
+    `);
   });
 
   // ******************************************
@@ -842,6 +1202,16 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       <span class="code-line numbered-code-line" data-line-number="3"></span>
       <span class="code-line numbered-code-line" data-line-number="4"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;</span>
       <span class="code-line numbered-code-line" data-line-number="5"></span>
+      </code></pre>"
+    `);
+
+    const html3 = String(await process(input, { showLineNumbers: true, trimBlankLines: true }));
+
+    expect(html3).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript">
+      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      <span class="code-line numbered-code-line" data-line-number="2"></span>
+      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;</span>
       </code></pre>"
     `);
   });
@@ -885,6 +1255,51 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       <span class="code-line numbered-code-line" data-line-number="7"></span>
       </code></pre>"
     `);
+
+    const html3 = String(await process(input, { showLineNumbers: true, trimBlankLines: true }));
+
+    expect(html3).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript">
+      <span class="code-line numbered-code-line" data-line-number="1"></span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="3"></span>
+      <span class="code-line numbered-code-line" data-line-number="4"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      <span class="code-line numbered-code-line" data-line-number="5"></span>
+      </code></pre>"
+    `);
+  });
+
+  // ******************************************
+  it("inside extra blank lines - 23", async () => {
+    const input = dedent`
+      \`\`\`javascript trimBlankLines
+
+      console.log("xxx");
+
+      let a = 1;
+      
+      \`\`\`
+    `;
+
+    const html1 = String(await process(input));
+
+    expect(html1).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript">
+      <span class="code-line"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      <span class="code-line"></span>
+      <span class="code-line"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;</span>
+      </code></pre>"
+    `);
+
+    const html2 = String(await process(input, { showLineNumbers: true }));
+
+    expect(html2).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript">
+      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      <span class="code-line numbered-code-line" data-line-number="2"></span>
+      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;</span>
+      </code></pre>"
+    `);
   });
 
   // ******************************************
@@ -921,6 +1336,17 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       <span class="code-line numbered-code-line" data-line-number="4"></span>
       <span class="code-line numbered-code-line" data-line-number="5"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;</span>
       <span class="code-line numbered-code-line" data-line-number="6"></span>
+      </code></pre>"
+    `);
+
+    const html3 = String(await process(input, { showLineNumbers: true, trimBlankLines: true }));
+
+    expect(html3).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript">
+      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-comment">// comment 1</span></span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-comment">// comment 2</span></span>
+      <span class="code-line numbered-code-line" data-line-number="3"></span>
+      <span class="code-line numbered-code-line" data-line-number="4"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;</span>
       </code></pre>"
     `);
   });
@@ -968,6 +1394,20 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       <span class="code-line numbered-code-line" data-line-number="7"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
       <span class="code-line numbered-code-line" data-line-number="8"></span>
       <span class="code-line numbered-code-line" data-line-number="9"></span>
+      </code></pre>"
+    `);
+
+    const html3 = String(await process(input, { showLineNumbers: true, trimBlankLines: true }));
+
+    expect(html3).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript">
+      <span class="code-line numbered-code-line" data-line-number="1"></span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-comment">/**</span></span>
+      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-comment"> * comment1</span></span>
+      <span class="code-line numbered-code-line" data-line-number="4"><span class="hljs-comment"> */</span></span>
+      <span class="code-line numbered-code-line" data-line-number="5"></span>
+      <span class="code-line numbered-code-line" data-line-number="6"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      <span class="code-line numbered-code-line" data-line-number="7"></span>
       </code></pre>"
     `);
   });

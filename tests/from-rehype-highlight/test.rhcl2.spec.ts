@@ -4,446 +4,411 @@ import { unified } from "unified";
 import rehypeParse from "rehype-parse";
 import rehypeStringify from "rehype-stringify";
 import rehypeHighlight from "rehype-highlight";
+import dedent from "dedent";
 
 import plugin from "../../src";
 
+// prettify <pre> putting new line right after opening tag
+String.prototype.prettifyPre = function () {
+  return this.replace(/<pre>(?!\n)/g, "<pre>\n");
+};
+
 // all the test is taken from `rehype-highlight` for reference
-// only added `rehype-highlight-code-lines` to see no change the test results
-describe("reyhpe-highlight-code-lines", () => {
+// added `rehype-highlight-code-lines` with options to see effects
+describe("reyhpe-highlight and reyhpe-highlight-code-lines together", () => {
+  it("should expose the public api", async () => {
+    expect(Object.keys(await import("rehype-highlight")).sort()).toEqual(["default"]);
+  });
+
   it("should work on empty code, no line numbering due to lack of piece of code", async () => {
-    const file = await unified()
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code></code></pre>
+    `;
+
+    const file2 = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { detect: true })
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process("<pre><code></code></pre>");
+      .process(input);
 
-    expect(String(file)).toEqual('<pre><code class="hljs"></code></pre>');
+    expect(String(file2)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code class="hljs"></code></pre>"
+    `);
   });
 
   it("should not highlight (no class), but add line numbering", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code>"use strict";</code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process('<pre><code>"use strict";</code></pre>');
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        "<pre><code>",
-        '<span class="code-line numbered-code-line" data-line-number="1">"use strict";</span>',
-        "</code></pre>",
-      ].join(""),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code><span class="code-line numbered-code-line" data-line-number="1">"use strict";</span></code></pre>"
+    `);
   });
 
   it("should highlight (`detect`, no class), and add line numbering", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code>"use strict";</code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { detect: true })
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process('<pre><code>"use strict";</code></pre>');
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        '<pre><code class="hljs language-javascript">',
-        '<span class="code-line numbered-code-line" data-line-number="1">',
-        '<span class="hljs-meta">"use strict"</span>;',
-        "</span></code></pre>",
-      ].join(""),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-meta">"use strict"</span>;</span></code></pre>"
+    `);
   });
 
   it("should highlight (detect, no class, subset), and add line numbering", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code>"use strict";</code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { detect: true, subset: ["arduino"] })
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process('<pre><code>"use strict";</code></pre>');
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        '<pre><code class="hljs language-arduino">',
-        '<span class="code-line numbered-code-line" data-line-number="1">',
-        '<span class="hljs-string">"use strict"</span>;',
-        "</span></code></pre>",
-      ].join(""),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code class="hljs language-arduino"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-string">"use strict"</span>;</span></code></pre>"
+    `);
   });
 
   it("should not highlight (`detect: false`, no class), but add line numbering", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code>"use strict";</code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { detect: false })
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process('<pre><code>"use strict";</code></pre>');
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        "<pre><code>",
-        '<span class="code-line numbered-code-line" data-line-number="1">"use strict";</span>',
-        "</code></pre>",
-      ].join(""),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code><span class="code-line numbered-code-line" data-line-number="1">"use strict";</span></code></pre>"
+    `);
   });
 
   it("should highlight (prefix without dash), and add line numbering", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code>"use strict";</code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { detect: true, prefix: "foo" })
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process('<pre><code>"use strict";</code></pre>');
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        '<pre><code class="foo language-javascript">',
-        '<span class="code-line numbered-code-line" data-line-number="1">',
-        '<span class="foometa">"use strict"</span>;',
-        "</span></code></pre>",
-      ].join(""),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code class="foo language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="foometa">"use strict"</span>;</span></code></pre>"
+    `);
   });
 
   it("should highlight (prefix with dash), and add line numbering", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code>"use strict";</code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { detect: true, prefix: "foo-" })
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process('<pre><code>"use strict";</code></pre>');
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        '<pre><code class="foo language-javascript">',
-        '<span class="code-line numbered-code-line" data-line-number="1">',
-        '<span class="foo-meta">"use strict"</span>;',
-        "</span></code></pre>",
-      ].join(""),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code class="foo language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="foo-meta">"use strict"</span>;</span></code></pre>"
+    `);
   });
 
   it("should highlight (lang class), and add line numbering", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code class="lang-js">var name = "World";
+      console.log("Hello, " + name + "!")</code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process(
-        [
-          '<pre><code class="lang-js">var name = "World";',
-          'console.log("Hello, " + name + "!")</code></pre>',
-        ].join("\n"),
-      );
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        [
-          '<pre><code class="hljs lang-js">',
-          '<span class="code-line numbered-code-line" data-line-number="1">',
-          '<span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;',
-          "</span>",
-        ].join(""),
-        [
-          '<span class="code-line numbered-code-line" data-line-number="2">',
-          '<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>',
-          '(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)',
-          "</span></code></pre>",
-        ].join(""),
-      ].join("\n"),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code class="hljs lang-js"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)</span></code></pre>"
+    `);
   });
 
   it("should highlight (language class), and add line numbering", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code class="language-js">var name = "World";
+      console.log("Hello, " + name + "!")</code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process(
-        [
-          '<pre><code class="language-js">var name = "World";',
-          'console.log("Hello, " + name + "!")</code></pre>',
-        ].join("\n"),
-      );
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        [
-          '<pre><code class="hljs language-js">',
-          '<span class="code-line numbered-code-line" data-line-number="1">',
-          '<span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;',
-          "</span>",
-        ].join(""),
-        [
-          '<span class="code-line numbered-code-line" data-line-number="2">',
-          '<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>',
-          '(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)',
-          "</span></code></pre>",
-        ].join(""),
-      ].join("\n"),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code class="hljs language-js"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)</span></code></pre>"
+    `);
   });
 
   it("should highlight (long name), and add line numbering", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code class="language-javascript">var name = "World";
+      console.log("Hello, " + name + "!")</code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process(
-        [
-          '<pre><code class="language-javascript">var name = "World";',
-          'console.log("Hello, " + name + "!")</code></pre>',
-        ].join("\n"),
-      );
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        [
-          '<pre><code class="hljs language-javascript">',
-          '<span class="code-line numbered-code-line" data-line-number="1">',
-          '<span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;',
-          "</span>",
-        ].join(""),
-        [
-          '<span class="code-line numbered-code-line" data-line-number="2">',
-          '<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>',
-          '(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)',
-          "</span></code></pre>",
-        ].join(""),
-      ].join("\n"),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)</span></code></pre>"
+    `);
   });
 
   it("should not highlight (`no-highlight`), but add line numbering", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code class="no-highlight">var name = "World";
+      console.log("Hello, " + name + "!")</code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process(
-        [
-          '<pre><code class="no-highlight">var name = "World";',
-          'console.log("Hello, " + name + "!")</code></pre>',
-        ].join("\n"),
-      );
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        [
-          '<pre><code class="no-highlight">',
-          '<span class="code-line numbered-code-line" data-line-number="1">',
-          'var name = "World";',
-          "</span>",
-        ].join(""),
-        [
-          '<span class="code-line numbered-code-line" data-line-number="2">',
-          'console.log("Hello, " + name + "!")',
-          "</span></code></pre>",
-        ].join(""),
-      ].join("\n"),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code class="no-highlight"><span class="code-line numbered-code-line" data-line-number="1">var name = "World";</span>
+      <span class="code-line numbered-code-line" data-line-number="2">console.log("Hello, " + name + "!")</span></code></pre>"
+    `);
   });
 
   it("should prefer `no-highlight` over a `language-*` class, but add line numbering", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code class="lang-js no-highlight">alert(1)</code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process('<pre><code class="lang-js no-highlight">alert(1)</code></pre>');
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        '<pre><code class="lang-js no-highlight">',
-        '<span class="code-line numbered-code-line" data-line-number="1">',
-        "alert(1)",
-        "</span></code></pre>",
-      ].join(""),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code class="lang-js no-highlight"><span class="code-line numbered-code-line" data-line-number="1">alert(1)</span></code></pre>"
+    `);
   });
 
-  it("should not highlight (`nohighlight`), and add line numbering", async () => {
+  it("should not highlight (`nohighlight`), but add line numbering", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code class="nohighlight">var name = "World";
+      console.log("Hello, " + name + "!")</code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process(
-        [
-          '<pre><code class="nohighlight">var name = "World";',
-          'console.log("Hello, " + name + "!")</code></pre>',
-        ].join("\n"),
-      );
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        [
-          '<pre><code class="nohighlight">',
-          '<span class="code-line numbered-code-line" data-line-number="1">',
-          'var name = "World";',
-          "</span>",
-        ].join(""),
-        [
-          '<span class="code-line numbered-code-line" data-line-number="2">',
-          'console.log("Hello, " + name + "!")',
-          "</span></code></pre>",
-        ].join(""),
-      ].join("\n"),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code class="nohighlight"><span class="code-line numbered-code-line" data-line-number="1">var name = "World";</span>
+      <span class="code-line numbered-code-line" data-line-number="2">console.log("Hello, " + name + "!")</span></code></pre>"
+    `);
   });
 
-  it("should warn on missing languages, but add line numbering", async () => {
+  it("should warn on missing languages", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code class="lang-foobar">var name = "World";
+      console.log("Hello, " + name + "!")</code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process(
-        [
-          '<pre><code class="lang-foobar">var name = "World";',
-          'console.log("Hello, " + name + "!")</code></pre>',
-        ].join("\n"),
-      );
+      .process(input);
 
     expect(file.messages.map(String)).toEqual([
-      "1:6-2:43: Cannot highlight as `foobar`, it’s not registered",
+      "3:6-4:43: Cannot highlight as `foobar`, it’s not registered",
     ]);
-
-    expect(String(file)).toEqual(
-      [
-        [
-          '<pre><code class="hljs lang-foobar">',
-          '<span class="code-line numbered-code-line" data-line-number="1">',
-          'var name = "World";',
-          "</span>",
-        ].join(""),
-        [
-          '<span class="code-line numbered-code-line" data-line-number="2">',
-          'console.log("Hello, " + name + "!")',
-          "</span></code></pre>",
-        ].join(""),
-      ].join("\n"),
-    );
   });
 
   it("should not highlight plainText-ed languages, but add line numbering", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code class="lang-js">var name = "World";
+      console.log("Hello, " + name + "!")</code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { plainText: ["js"] })
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process(
-        [
-          '<pre><code class="lang-js">var name = "World";',
-          'console.log("Hello, " + name + "!")</code></pre>',
-        ].join("\n"),
-      );
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        [
-          '<pre><code class="lang-js">',
-          '<span class="code-line numbered-code-line" data-line-number="1">',
-          'var name = "World";',
-          "</span>",
-        ].join(""),
-        [
-          '<span class="code-line numbered-code-line" data-line-number="2">',
-          'console.log("Hello, " + name + "!")',
-          "</span></code></pre>",
-        ].join(""),
-      ].join("\n"),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code class="lang-js"><span class="code-line numbered-code-line" data-line-number="1">var name = "World";</span>
+      <span class="code-line numbered-code-line" data-line-number="2">console.log("Hello, " + name + "!")</span></code></pre>"
+    `);
   });
 
-  it("should not remove contents", async () => {
+  it("should not remove contents, and add line numbering", async () => {
+    const input = "<pre><code>def add(a, b):\n  return a + b</code></pre>";
+
     // For some reason this isn’t detected as c++.
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { detect: true, subset: ["cpp"] })
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process(`<pre><code>def add(a, b):\n  return a + b</code></pre>`);
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        [
-          '<pre><code class="hljs">',
-          '<span class="code-line numbered-code-line" data-line-number="1">',
-          "def add(a, b):",
-          "</span>",
-        ].join(""),
-        [
-          '<span class="code-line numbered-code-line" data-line-number="2">',
-          "  return a + b",
-          "</span></code></pre>",
-        ].join(""),
-      ].join("\n"),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<pre><code class="hljs"><span class="code-line numbered-code-line" data-line-number="1">def add(a, b):</span>
+      <span class="code-line numbered-code-line" data-line-number="2">  return a + b</span></code></pre>"
+    `);
   });
 
-  it("should support multiple `code`s in a `pre`, and line numbering", async () => {
-    const file = await unified()
-      .use(rehypeParse, { fragment: true })
-      .use(rehypeHighlight)
-      .use(plugin, { showLineNumbers: true })
-      .use(rehypeStringify).process(`<pre>
-  <code class="language-javascript">const a = 1;</code>
-  <code class="language-python">printf("x")</code>
-</pre>`);
-
-    expect(String(file)).toEqual(
-      [
-        [
-          '<pre>  <code class="hljs language-javascript">',
-          '<span class="code-line numbered-code-line" data-line-number="1">',
-          '<span class="hljs-keyword">const</span> a = <span class="hljs-number">1</span>;',
-          "</span></code>",
-        ].join(""),
-        [
-          '  <code class="hljs language-python">',
-          '<span class="code-line numbered-code-line" data-line-number="1">',
-          'printf(<span class="hljs-string">"x"</span>)',
-          "</span></code>",
-        ].join(""),
-        "</pre>",
-      ].join("\n"),
-    );
-  });
-
-  it("should reprocess exact", async () => {
-    const expected = [
-      [
-        '<pre><code class="hljs lang-js">',
-        '<span class="code-line numbered-code-line" data-line-number="1">',
-        '<span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;',
-        "</span>",
-      ].join(""),
-      [
-        '<span class="code-line numbered-code-line" data-line-number="2">',
-        '<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>',
-        '(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)',
-        "</span></code></pre>",
-      ].join(""),
-    ].join("\n");
+  it("should support multiple `code`s in a `pre`, and add line numbering", async () => {
+    const input = dedent`
+      <pre>
+        <code class="language-javascript">const a = 1;</code>
+        <code class="language-python">printf("x")</code>
+      </pre>
+    `;
 
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
+      .process(input);
+
+    expect(String(file).prettifyPre()).toMatchInlineSnapshot(`
+      "<pre>
+        <code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">const</span> a = <span class="hljs-number">1</span>;</span></code>
+        <code class="hljs language-python"><span class="code-line numbered-code-line" data-line-number="1">printf(<span class="hljs-string">"x"</span>)</span></code>
+      </pre>"
+    `);
+  });
+
+  it("should reprocess exact", async () => {
+    const expected = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code class="hljs lang-js">
+      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)</span>
+      </code></pre>
+    `;
+
+    const file = await unified()
+      .use(rehypeParse, { fragment: true })
+      .use(rehypeHighlight)
+      .use(plugin, { showLineNumbers: true, trimBlankLines: true })
+      .use(rehypeStringify)
       .process(expected);
 
     expect(String(file)).toEqual(expected);
   });
 
-  it("should parse custom language", async () => {
+  it("should parse custom language, and add line numbering", async () => {
+    const input = '<pre><code class="lang-funkyscript">let a;</code></pre>';
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, {
@@ -451,64 +416,67 @@ describe("reyhpe-highlight-code-lines", () => {
       })
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process('<pre><code class="lang-funkyscript">console.log(1)</code></pre>');
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        '<pre><code class="hljs lang-funkyscript">',
-        '<span class="code-line numbered-code-line" data-line-number="1">',
-        '<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-number">1</span>)',
-        "</span></code></pre>",
-      ].join(""),
+    expect(String(file)).toMatchInlineSnapshot(
+      `"<pre><code class="hljs lang-funkyscript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">let</span> a;</span></code></pre>"`,
     );
   });
 
-  it("should ignore comments", async () => {
+  it("should ignore comments, and add line numbering", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code><!--TODO-->"use strict";</code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, { detect: true })
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process('<pre><code><!--TODO-->"use strict";</code></pre>');
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        '<pre><code class="hljs language-javascript">',
-        '<span class="code-line numbered-code-line" data-line-number="1">',
-        '<span class="hljs-meta">"use strict"</span>;',
-        "</span></code></pre>",
-      ].join(""),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-meta">"use strict"</span>;</span></code></pre>"
+    `);
   });
 
-  it("should support `<br>` elements", async () => {
+  it("should support `<br>` elements, and add line numbering", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code class="language-javascript">
+      "use strict";<br>console.log("very strict");
+      </code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
-      .use(plugin, { showLineNumbers: true })
+      .use(plugin, { showLineNumbers: true, trimBlankLines: true })
       .use(rehypeStringify)
-      .process(
-        '<pre><code class="language-javascript">"use strict";<br>console.log("very strict")</code></pre>',
-      );
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        [
-          '<pre><code class="hljs language-javascript">',
-          '<span class="code-line numbered-code-line" data-line-number="1">',
-          '<span class="hljs-meta">"use strict"</span>;',
-          "</span>",
-        ].join(""),
-        [
-          '<span class="code-line numbered-code-line" data-line-number="2">',
-          '<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"very strict"</span>)',
-          "</span></code></pre>",
-        ].join(""),
-      ].join("\n"),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code class="hljs language-javascript">
+      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-meta">"use strict"</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"very strict"</span>);</span>
+      </code></pre>"
+    `);
   });
 
-  it("should register languages", async () => {
+  it("should register languages, and add line numbering", async () => {
+    const input = dedent`
+      <h1>Hello World!</h1>
+
+      <pre><code class="language-test">alpha bravo charlie</code></pre>
+    `;
+
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight, {
@@ -524,15 +492,12 @@ describe("reyhpe-highlight-code-lines", () => {
       })
       .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
-      .process('<pre><code class="language-test">alpha bravo charlie</code></pre>');
+      .process(input);
 
-    expect(String(file)).toEqual(
-      [
-        '<pre><code class="hljs language-test">',
-        '<span class="code-line numbered-code-line" data-line-number="1">',
-        'alpha <span class="hljs-keyword">bravo</span> charlie',
-        "</span></code></pre>",
-      ].join(""),
-    );
+    expect(String(file)).toMatchInlineSnapshot(`
+      "<h1>Hello World!</h1>
+
+      <pre><code class="hljs language-test"><span class="code-line numbered-code-line" data-line-number="1">alpha <span class="hljs-keyword">bravo</span> charlie</span></code></pre>"
+    `);
   });
 });
