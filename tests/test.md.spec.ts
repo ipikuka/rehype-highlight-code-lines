@@ -1411,4 +1411,72 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       </code></pre>"
     `);
   });
+
+  // ******************************************
+  it("inside extra blank lines - 41, multiline comment in python", async () => {
+    const input = dedent`
+      \`\`\`python
+      def multiply_numbers(x, y):
+        """
+        Multiplies two numbers and returns the product.
+
+        Args:
+          x (float): The first number.
+          y (float): The second number.
+
+        Returns:
+          float: The product of x and y.
+        """
+        return x * y
+
+      # Example usage:
+      product = multiply_numbers(4, 7)
+      print("The product is:", product)
+      \`\`\`
+    `;
+
+    const html1 = String(await process(input));
+
+    expect(html1).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">multiply_numbers</span>(<span class="hljs-params">x, y</span>):
+        <span class="hljs-string">"""
+        Multiplies two numbers and returns the product.
+
+        Args:
+          x (float): The first number.
+          y (float): The second number.
+
+        Returns:
+          float: The product of x and y.
+        """</span>
+        <span class="hljs-keyword">return</span> x * y
+
+      <span class="hljs-comment"># Example usage:</span>
+      product = multiply_numbers(<span class="hljs-number">4</span>, <span class="hljs-number">7</span>)
+      <span class="hljs-built_in">print</span>(<span class="hljs-string">"The product is:"</span>, product)
+      </code></pre>"
+    `);
+
+    const html2 = String(await process(input, { showLineNumbers: true }));
+
+    expect(html2).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-python"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">def</span> <span class="hljs-title function_">multiply_numbers</span>(<span class="hljs-params">x, y</span>):</span>
+      <span class="code-line numbered-code-line" data-line-number="2">  <span class="hljs-string">"""</span></span>
+      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-string">  Multiplies two numbers and returns the product.</span></span>
+      <span class="code-line numbered-code-line" data-line-number="4"><span class="hljs-string"></span></span>
+      <span class="code-line numbered-code-line" data-line-number="5"><span class="hljs-string">  Args:</span></span>
+      <span class="code-line numbered-code-line" data-line-number="6"><span class="hljs-string">    x (float): The first number.</span></span>
+      <span class="code-line numbered-code-line" data-line-number="7"><span class="hljs-string">    y (float): The second number.</span></span>
+      <span class="code-line numbered-code-line" data-line-number="8"><span class="hljs-string"></span></span>
+      <span class="code-line numbered-code-line" data-line-number="9"><span class="hljs-string">  Returns:</span></span>
+      <span class="code-line numbered-code-line" data-line-number="10"><span class="hljs-string">    float: The product of x and y.</span></span>
+      <span class="code-line numbered-code-line" data-line-number="11"><span class="hljs-string">  """</span></span>
+      <span class="code-line numbered-code-line" data-line-number="12">  <span class="hljs-keyword">return</span> x * y</span>
+      <span class="code-line numbered-code-line" data-line-number="13"></span>
+      <span class="code-line numbered-code-line" data-line-number="14"><span class="hljs-comment"># Example usage:</span></span>
+      <span class="code-line numbered-code-line" data-line-number="15">product = multiply_numbers(<span class="hljs-number">4</span>, <span class="hljs-number">7</span>)</span>
+      <span class="code-line numbered-code-line" data-line-number="16"><span class="hljs-built_in">print</span>(<span class="hljs-string">"The product is:"</span>, product)</span>
+      </code></pre>"
+    `);
+  });
 });

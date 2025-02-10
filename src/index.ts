@@ -14,7 +14,7 @@ declare module "hast" {
 }
 
 type ElementWithTextNode = Element & {
-  children: [Text, ...ElementContent[]];
+  children: [Text];
 };
 
 export type HighlightLinesOptions = {
@@ -59,7 +59,10 @@ function isStringArray(value: unknown): value is string[] {
 // check if it is Element which first child is text
 function isElementWithTextNode(node: ElementContent | undefined): node is ElementWithTextNode {
   return (
-    node?.type === "element" && node.children[0]?.type === "text" && "value" in node.children[0]
+    node?.type === "element" &&
+    node.children.length === 1 &&
+    node.children[0].type === "text" &&
+    "value" in node.children[0]
   );
 }
 
@@ -189,7 +192,6 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       const child = code.children[index];
 
       if (!isElementWithTextNode(child)) continue;
-      if (!hasClassName(child, "comment")) continue;
 
       const textNode = child.children[0];
       if (!REGEX_LINE_BREAKS.test(textNode.value)) continue;
@@ -269,9 +271,9 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
   ) {
     hasFlatteningNeed(code) && flattenCodeTree(code); // mutates the code
 
-    handleMultiLineComments(code); // mutates the code
-
     handleFirstElementContent(code); // mutates the code
+
+    handleMultiLineComments(code); // mutates the code
 
     handleTrimmingBlankLines(code, directiveTrimBlankLines);
 
