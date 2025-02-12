@@ -48,7 +48,7 @@ export function clsx(arr: (string | false | null | undefined | 0)[]): string[] {
   return arr.filter((item): item is string => !!item);
 }
 
-// check if it is string array
+// check if it is a string array
 function isStringArray(value: unknown): value is string[] {
   return (
     // type-coverage:ignore-next-line
@@ -354,22 +354,19 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
    * get the programming language analyzing the classNames
    *
    */
-  function getLanguage(classNames: (string | number)[] | undefined): string | undefined {
-    const isLanguageString = (element: string | number): element is string => {
-      return String(element).startsWith("language-") || String(element).startsWith("lang-");
-    };
+  function getLanguage(classNames: string[] | undefined): string | undefined {
+    if (!classNames) return;
 
-    const languageString = classNames?.find(isLanguageString);
+    const isLanguageString = (element: string): boolean =>
+      element.startsWith("language-") || element.startsWith("lang-");
 
-    if (languageString?.slice(0, 5) === "lang-") {
-      return languageString.slice(5).toLowerCase();
-    }
+    const languageString = classNames.find(isLanguageString);
 
-    if (languageString?.slice(0, 9) === "language-") {
-      return languageString.slice(9).toLowerCase();
-    }
+    if (!languageString) return;
 
-    return languageString;
+    const language = languageString.slice(languageString.indexOf("-") + 1).toLowerCase();
+
+    return language;
   }
 
   /**

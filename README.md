@@ -177,7 +177,7 @@ Sometimes you may want to start the line numbering from a specific number. In th
 
 #### `lineContainerTagName` (Deprecated)
 
-**It is marked as `@deprecated` and will be removed in the next versions.
+**It is marked as `@deprecated` and will be removed in the next versions.**
 
 It was a **union** option which was **"div" | "span"** for providing custom HTML tag name for code lines.
 
