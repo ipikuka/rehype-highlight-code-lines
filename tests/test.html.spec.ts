@@ -4,20 +4,10 @@ import { unified } from "unified";
 import rehypeParse from "rehype-parse";
 import rehypeHighlight from "rehype-highlight";
 import rehypeStringify from "rehype-stringify";
-
-import plugin from "../src";
 import dedent from "dedent";
 
-declare global {
-  interface String {
-    prettifyPre(): string;
-  }
-}
-
-// prettify <pre> putting new line right after opening tag
-String.prototype.prettifyPre = function () {
-  return this.replace(/<pre>(?!\n)/g, "<pre>\n");
-};
+import plugin from "../src";
+import "./util/test-utils";
 
 describe("rehype-highlight-code-line for html", () => {
   it("should not highlight but support line numbering for multiple `code`", async () => {

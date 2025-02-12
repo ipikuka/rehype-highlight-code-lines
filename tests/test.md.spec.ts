@@ -3,6 +3,7 @@ import dedent from "dedent";
 import * as prettier from "prettier";
 
 import { process } from "./util/index";
+import "./util/test-utils";
 
 describe("reyhpe-highlight-code-lines", () => {
   // ******************************************

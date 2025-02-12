@@ -7,11 +7,7 @@ import rehypeHighlight from "rehype-highlight";
 import dedent from "dedent";
 
 import plugin from "../../src";
-
-// prettify <pre> putting new line right after opening tag
-String.prototype.prettifyPre = function () {
-  return this.replace(/<pre>(?!\n)/g, "<pre>\n");
-};
+import "../util/test-utils";
 
 // all the test is taken from `rehype-highlight` for reference
 // added `rehype-highlight-code-lines` with options to see effects

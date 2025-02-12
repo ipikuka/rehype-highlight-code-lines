@@ -7,12 +7,7 @@ import { toText } from "hast-util-to-text";
 import { removePosition } from "unist-util-remove-position";
 import dedent from "dedent";
 
-// How rehype-highligt works !
-
-// prettify <pre> putting new line right after opening tag
-String.prototype.prettifyPre = function () {
-  return this.replace(/<pre>(?!\n)/g, "<pre>\n");
-};
+// How rehype-highligt works from markdown!
 
 const lowlight = createLowlight(common);
 
