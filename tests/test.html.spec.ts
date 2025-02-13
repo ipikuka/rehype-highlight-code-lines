@@ -1,15 +1,10 @@
 import { describe, it, expect } from "vitest";
-
-import { unified } from "unified";
-import rehypeParse from "rehype-parse";
-import rehypeHighlight from "rehype-highlight";
-import rehypeStringify from "rehype-stringify";
 import dedent from "dedent";
 
-import plugin from "../src";
 import "./util/test-utils";
+import { processFromHtml } from "./util";
 
-describe("rehype-highlight-code-line for html", () => {
+describe("rehype-highlight-code-line, with html sources", () => {
   it("should not highlight but support line numbering for multiple `code`", async () => {
     const html = dedent`
       <pre>
@@ -18,12 +13,7 @@ describe("rehype-highlight-code-line for html", () => {
       </pre>
     `;
 
-    const file = await unified()
-      .use(rehypeParse, { fragment: true })
-      .use(rehypeHighlight)
-      .use(plugin, { showLineNumbers: true })
-      .use(rehypeStringify)
-      .process(html);
+    const file = String(await processFromHtml(html, { showLineNumbers: true }));
 
     expect(String(file).prettifyPre()).toMatchInlineSnapshot(`
       "<pre>
@@ -41,12 +31,7 @@ describe("rehype-highlight-code-line for html", () => {
       </pre>
     `;
 
-    const file = await unified()
-      .use(rehypeParse, { fragment: true })
-      .use(rehypeHighlight)
-      .use(plugin, { showLineNumbers: true })
-      .use(rehypeStringify)
-      .process(html);
+    const file = String(await processFromHtml(html, { showLineNumbers: true }));
 
     expect(String(file).prettifyPre()).toMatchInlineSnapshot(`
       "<pre>
@@ -65,12 +50,7 @@ describe("rehype-highlight-code-line for html", () => {
       </pre>
     `;
 
-    const file = await unified()
-      .use(rehypeParse, { fragment: true })
-      .use(rehypeHighlight)
-      .use(plugin, { showLineNumbers: true })
-      .use(rehypeStringify)
-      .process(html);
+    const file = String(await processFromHtml(html, { showLineNumbers: true }));
 
     expect(String(file).prettifyPre()).toMatchInlineSnapshot(`
       "<pre>

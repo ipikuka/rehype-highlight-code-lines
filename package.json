@@ -17,6 +17,7 @@
     "test:file2": "vitest test.html.spec.ts",
     "test:file3": "vitest test.cases.spec.ts",
     "test:file4": "vitest from-rehype-highlight/test.rhcl2.spec.ts",
+    "test:file5": "vitest test.raw.spec.ts",
     "prepack": "npm run build",
     "prepublishOnly": "npm run test && npm run format && npm run test-coverage",
     "test-coverage": "vitest run --coverage"
@@ -67,6 +68,7 @@
     "rehype": "^13.0.2",
     "rehype-highlight": "^7.0.2",
     "rehype-parse": "^9.0.1",
+    "rehype-raw": "^7.0.0",
     "rehype-stringify": "^10.0.1",
     "remark-gfm": "^4.0.0",
     "remark-parse": "^11.0.0",
@@ -75,10 +77,10 @@
     "type-coverage": "^2.29.7",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.23.0",
+    "unified": "^11.0.5",
     "unist-util-remove-position": "^5.0.0",
     "vfile": "^6.0.3",
-    "vitest": "^3.0.5",
-    "unified": "^11.0.5"
+    "vitest": "^3.0.5"
   },
   "dependencies": {
     "@types/hast": "^3.0.4",
