@@ -287,6 +287,46 @@ describe("reyhpe-highlight-code-lines, with markdown sources", () => {
   });
 
   // ******************************************
+  it("with language, with line numbering starting from zero", async () => {
+    const input = dedent`
+      \`\`\`javascript showLineNumbers=0
+      const a1=1;
+      const a2=2;
+      const a3=3;
+      \`\`\`
+    `;
+
+    const html = String(await processFromMd(input));
+
+    expect(html).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="0"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">const</span> a2=<span class="hljs-number">2</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-keyword">const</span> a3=<span class="hljs-number">3</span>;</span>
+      </code></pre>"
+    `);
+
+    expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
+      "<pre>
+        <code class="hljs language-javascript">
+          <span class="code-line numbered-code-line" data-line-number="0">
+            <span class="hljs-keyword">const</span> a1=
+            <span class="hljs-number">1</span>;
+          </span>
+          <span class="code-line numbered-code-line" data-line-number="1">
+            <span class="hljs-keyword">const</span> a2=
+            <span class="hljs-number">2</span>;
+          </span>
+          <span class="code-line numbered-code-line" data-line-number="2">
+            <span class="hljs-keyword">const</span> a3=
+            <span class="hljs-number">3</span>;
+          </span>
+        </code>
+      </pre>
+      "
+    `);
+  });
+
+  // ******************************************
   it("with language, with line numbering starting from a specific number and line highlighting", async () => {
     const input = dedent`
       \`\`\`javascript {2} showLineNumbers=11

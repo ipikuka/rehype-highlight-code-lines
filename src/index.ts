@@ -9,7 +9,11 @@ type PartiallyRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
 
 declare module "hast" {
   interface Data {
-    meta?: string | undefined;
+    meta?: string;
+  }
+  interface Properties {
+    dataStartNumbering?: string;
+    dataHighlightLines?: string;
   }
 }
 
@@ -38,9 +42,9 @@ type PartiallyRequiredHighlightLinesOptions = Prettify<
 >;
 
 type GutterOptions = {
-  directiveShowLineNumbers: boolean | number;
-  directiveHighlightLines: number[];
-  directiveTrimBlankLines: boolean;
+  directiveLineNumbering: boolean | number;
+  directiveLineHighlighting: number[];
+  directiveLineTrimming: boolean;
 };
 
 // a simple util for our use case, like clsx package
@@ -150,8 +154,8 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
   const createLine = (
     children: ElementContent[],
     lineNumber: number,
-    directiveShowLineNumbers: boolean | number,
-    directiveHighlightLines: number[],
+    directiveLineNumbering: boolean | number,
+    directiveLineHighlighting: number[],
   ): Element => {
     const firstChild = children[0];
     const isAddition = hasClassName(firstChild, "addition");
@@ -164,15 +168,15 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       properties: {
         className: clsx([
           "code-line",
-          directiveShowLineNumbers && "numbered-code-line",
-          directiveHighlightLines.includes(lineNumber) && "highlighted-code-line",
+          (directiveLineNumbering || directiveLineNumbering === 0) && "numbered-code-line",
+          directiveLineHighlighting.includes(lineNumber) && "highlighted-code-line",
           isAddition && "inserted",
           isDeletion && "deleted",
         ]),
         dataLineNumber:
-          typeof directiveShowLineNumbers === "number"
-            ? directiveShowLineNumbers - 1 + lineNumber
-            : directiveShowLineNumbers
+          typeof directiveLineNumbering === "number"
+            ? directiveLineNumbering - 1 + lineNumber
+            : directiveLineNumbering
               ? lineNumber
               : undefined,
       },
@@ -243,8 +247,8 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
    * handle trimming blank line for the last text node
    *
    */
-  function handleTrimmingBlankLines(code: Element, directiveTrimBlankLines: boolean) {
-    if (!directiveTrimBlankLines) return;
+  function handleTrimmingBlankLines(code: Element, directiveLineTrimming: boolean) {
+    if (!directiveLineTrimming) return;
 
     const lastChild = code.children[code.children.length - 1];
 
@@ -263,11 +267,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
    */
   function gutter(
     code: Element,
-    {
-      directiveShowLineNumbers,
-      directiveHighlightLines,
-      directiveTrimBlankLines,
-    }: GutterOptions,
+    { directiveLineNumbering, directiveLineHighlighting, directiveLineTrimming }: GutterOptions,
   ) {
     hasFlatteningNeed(code) && flattenCodeTree(code); // mutates the code
 
@@ -275,7 +275,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
     handleMultiLineComments(code); // mutates the code
 
-    handleTrimmingBlankLines(code, directiveTrimBlankLines);
+    handleTrimmingBlankLines(code, directiveLineTrimming);
 
     const replacement: ElementContent[] = [];
 
@@ -309,12 +309,12 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
         const isFirstIteration = index === 0 && iteration === 0;
 
-        if (isFirstIteration && directiveTrimBlankLines && line.length === 0) {
+        if (isFirstIteration && directiveLineTrimming && line.length === 0) {
           replacement.push({ type: "text", value: match[0] }); // eol
         } else {
           lineNumber += 1;
           replacement.push(
-            createLine(line, lineNumber, directiveShowLineNumbers, directiveHighlightLines),
+            createLine(line, lineNumber, directiveLineNumbering, directiveLineHighlighting),
             { type: "text", value: match[0] }, // eol
           );
         }
@@ -338,10 +338,10 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
     }
 
     if (line.length > 0) {
-      directiveTrimBlankLines
+      directiveLineTrimming
         ? replacement.push(...line)
         : replacement.push(
-            createLine(line, ++lineNumber, directiveShowLineNumbers, directiveHighlightLines),
+            createLine(line, ++lineNumber, directiveLineNumbering, directiveLineHighlighting),
           );
     }
 
@@ -387,64 +387,135 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
         return;
       }
 
-      const classNames = code.properties.className;
+      // for type narrowing
+      if (
+        !isStringArray(code.properties.className) &&
+        code.properties.className !== undefined
+        /* v8 ignore next 3 */
+      ) {
+        return;
+      }
 
-      // only for type narrowing
-      /* v8 ignore next */
-      if (!isStringArray(classNames) && classNames !== undefined) return;
+      /** the part of correcting language and meta */
 
       let meta = code.data?.meta?.toLowerCase().trim() ?? "";
 
-      const language = getLanguage(classNames);
+      const language = getLanguage(code.properties.className);
 
       if (
-        language?.startsWith("{") ||
-        language?.startsWith("showlinenumbers") ||
-        language?.startsWith("nolinenumbers") ||
-        language?.startsWith("trimblanklines")
+        language &&
+        (language.startsWith("{") ||
+          language.startsWith("showlinenumbers") ||
+          language.startsWith("nolinenumbers") ||
+          language.startsWith("trimblanklines"))
       ) {
         // add specifiers to meta
         meta = (language + " " + meta).trim();
 
         // correct the code's meta
-        code.data && (code.data.meta = meta);
+        code.data && (code.data.meta = (language + " " + code.data.meta).trim());
 
         // remove all classnames like hljs, lang-{1,3}, language-showLineNumbers, because of false positive
         code.properties.className = undefined;
       }
 
-      let directiveShowLineNumbers: boolean | number = meta.includes("nolinenumbers")
+      const keywords = ["showlinenumbers", "trimblanklines", "nolinenumbers"];
+
+      const classNames = code.properties.className
+        ?.map((cls) => cls.toLowerCase().replaceAll("-", ""))
+        .filter((cls) => keywords.includes(cls));
+
+      /** the part of defining the directive for line numbering */
+
+      const directiveNoLineNumbers =
+        meta.includes("nolinenumbers") || Boolean(classNames?.includes("nolinenumbers"));
+
+      const directiveShowLineNumbers =
+        settings.showLineNumbers ||
+        meta.includes("showlinenumbers") ||
+        Boolean(classNames?.includes("showlinenumbers"));
+
+      let directiveLineNumbering: boolean | number = directiveNoLineNumbers
         ? false
-        : settings.showLineNumbers || meta.includes("showlinenumbers");
+        : directiveShowLineNumbers;
 
       // find the number where the line number starts, if exists
-      const REGEX1 = /showlinenumbers=(?<start>\d+)/i;
+      const REGEX1 = /showlinenumbers=(?<start>\d+)/;
       const start = REGEX1.exec(meta)?.groups?.start;
-      if (start && !isNaN(Number(start))) directiveShowLineNumbers = Number(start);
+
+      if (!directiveNoLineNumbers && !isNaN(Number(start))) {
+        directiveLineNumbering = Number(start);
+      }
+
+      // get the number where the line number starts, if exists
+      const { dataStartNumbering } = code.properties;
+      if ("dataStartNumbering" in code.properties) {
+        code.properties["dataStartNumbering"] = undefined;
+      }
+
+      if (
+        !directiveNoLineNumbers &&
+        dataStartNumbering !== "" &&
+        !isNaN(Number(dataStartNumbering))
+      ) {
+        directiveLineNumbering = Number(dataStartNumbering);
+      }
+
+      /** the part of defining the directive for line highlighting */
 
       // find number range string within curly braces and parse it
-      const REGEX2 = /{(?<lines>[\d\s,-]+)}/g;
+      const directiveLineHighlighting: number[] = [];
+      const REGEX2 = /{(?<lines>[\d\s,-]+)}/;
       const strLineNumbers = REGEX2.exec(meta)?.groups?.lines?.replace(/\s/g, "");
-      const directiveHighlightLines = strLineNumbers ? rangeParser(strLineNumbers) : [];
+
+      if (strLineNumbers) {
+        const range = rangeParser(strLineNumbers);
+        directiveLineHighlighting.push(...range);
+      }
+
+      // get number range string within properties and parse it
+      const { dataHighlightLines } = code.properties;
+      if ("dataHighlightLines" in code.properties) {
+        code.properties["dataHighlightLines"] = undefined;
+      }
+
+      if (dataHighlightLines) {
+        const range = rangeParser(dataHighlightLines.replace(/\s/g, ""));
+        directiveLineHighlighting.push(...range);
+      }
+
+      /** the part of defining the directive for line trimming */
 
       // find the directive for trimming blank lines
-      const REGEX3 = /trimblanklines/i;
-      const directiveTrimBlankLines = settings.trimBlankLines || REGEX3.test(meta);
+      const directiveLineTrimming =
+        settings.trimBlankLines ||
+        /trimblanklines/.test(meta) ||
+        Boolean(classNames?.includes("trimblanklines"));
 
-      // if nothing to do for numbering, highlihting or trimming blank lines, just return;
+      /** the part of cleaning of code properties */
+
+      code.properties.className = code.properties.className?.filter(
+        (cls) => !keywords.includes(cls.toLowerCase().replaceAll("-", "")),
+      );
+
+      if (isStringArray(code.properties.className) && code.properties.className.length === 0) {
+        code.properties.className = undefined;
+      }
+
+      // if nothing to do for numbering, highlihting or trimming, just return;
       if (
-        directiveShowLineNumbers === false &&
-        directiveHighlightLines.length === 0 &&
-        directiveTrimBlankLines === false
+        directiveLineNumbering === false &&
+        directiveLineHighlighting.length === 0 &&
+        directiveLineTrimming === false
       ) {
         return;
       }
 
       // add container for each line mutating the code element
       gutter(code, {
-        directiveShowLineNumbers,
-        directiveHighlightLines,
-        directiveTrimBlankLines,
+        directiveLineNumbering,
+        directiveLineHighlighting,
+        directiveLineTrimming,
       });
     });
   };
