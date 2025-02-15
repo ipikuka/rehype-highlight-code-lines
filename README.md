@@ -100,26 +100,26 @@ async function main() {
 }
 ```
 
-Now, running `node example.js` you will see that each line of code is wrapped in a `div`, which has appropriate class names (`code-line`, `numbered-code-line`, `highlighted-code-line`)  and line numbering attribute `data-line-number`.
+Now, running `node example.js` you will see that each line of code is wrapped in a `span`, which has appropriate class names (`code-line`, `numbered-code-line`, `highlighted-code-line`)  and line numbering attribute `data-line-number`.
 
 ```html
 <pre>
   <code class="hljs language-javascript">
-    <div class="code-line numbered-code-line" data-line-number="1">
+    <span class="code-line numbered-code-line" data-line-number="1">
       <span class="hljs-keyword">let</span> a1;
-    </div>
-    <div
+    </span>
+    <span
       class="code-line numbered-code-line highlighted-code-line" data-line-number="2">
       <span class="hljs-keyword">let</span> a2;
-    </div>
-    <div class="code-line numbered-code-line" data-line-number="3">
+    </span>
+    <span class="code-line numbered-code-line" data-line-number="3">
       <span class="hljs-keyword">let</span> a3;
-    </div>
+    </span>
   </code>
 </pre>
 ```
 
-Without `rehype-highlight-code-lines`, the lines of code wouldn't be in a `div`.
+Without `rehype-highlight-code-lines`, the lines of code wouldn't be in a `span`.
 
 ```html
 <pre>
@@ -133,6 +133,92 @@ Without `rehype-highlight-code-lines`, the lines of code wouldn't be in a `div`.
 
 ***Note:** `hljs` prefix comes from `rehype-highlight`*.
 
+## Usage in HTML attributes
+
+**`rehype-highlight-code-lines`** runs on `<code>` elements with directives like `showLineNumbers` and range number in curly braces like `{2-4, 8}`. That directives can be passed as a word in markdown (` ```ts showLineNumbers {2-4, 8} `) or as a class and attribute in HTML (`<code class="language-ts show-line-numbers" data-highlight-lines="2-4, 8">`).
+
+The inverse occurs when the option `showLineNumbers` is true. All `<code>` are processed and numbered. Then (` ```ts noLineNumbers `), or as a class (`<code class="language-ts no-line-numbers">`) can be used to prevent processing.
+
+**The class directives can be with dash or without, or camel cased.**
+
+See some example usage as HTML class and attributes *(only opening `<code>` tags are provided, the rest is  omitted.)*:
+```html
+<code class="language-typescript show-line-numbers">
+<code class="language-typescript showlinenumbers">
+<code class="language-typescript showLineNumbers">
+
+<code class="language-typescript show-line-numbers" data-highlight-lines="2-4">
+<code class="language-typescript show-line-numbers" data-start-numbering="11">
+<code class="language-typescript show-line-numbers" data-start-numbering="11" data-highlight-lines="2-4">
+
+<code class="language-typescript no-line-numbers">
+<code class="language-typescript nolinenumbers">
+<code class="language-typescript noLineNumbers">
+<code class="language-typescript no-line-numbers" data-highlight-lines="2-4">
+
+<code class="no-line-numbers">
+<code class="show-line-numbers">
+<code class="show-line-numbers" data-highlight-lines="2-4">
+<code data-highlight-lines="2-4">
+<code data-start-numbering="11">
+```
+
+Say we have the following HTML fragment in a `example.md`:
+
+```markdown
+<pre><code class="language-javascript show-line-numbers" data-highlight-lines="2">
+let a1;
+let a2;
+let a3;
+</code></pre>
+```
+
+I assume you use `rehype-highlight` for code highlighting. Our module, `example.js`, looks as follows:
+
+```javascript
+import { read } from "to-vfile";
+import remarkParse from "remark-parse";
+import remarkRehype from "remark-rehype";
+import rehypeRaw from "rehype-raw";
+import rehypeHighlight from "rehype-highlight";
+import rehypeHighlightLines from "rehype-highlight-code-lines";
+import rehypeStringify from "rehype-stringify";
+
+main();
+
+async function main() {
+  const file = await unified()
+    .use(remarkParse)
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeRaw)
+    .use(rehypeHighlight)
+    .use(rehypeHighlightLines)
+    .use(rehypeStringify)
+    .process(await read("example.md"));
+
+  console.log(String(file));
+}
+```
+
+Now, running `node example.js` you will see that each line of code is wrapped in a `span`, which has appropriate class names (`code-line`, `numbered-code-line`, `highlighted-code-line`)  and line numbering attribute `data-line-number`.
+
+```html
+<pre>
+  <code class="hljs language-javascript">
+    <span class="code-line numbered-code-line" data-line-number="1">
+      <span class="hljs-keyword">let</span> a1;
+    </span>
+    <span
+      class="code-line numbered-code-line highlighted-code-line" data-line-number="2">
+      <span class="hljs-keyword">let</span> a2;
+    </span>
+    <span class="code-line numbered-code-line" data-line-number="3">
+      <span class="hljs-keyword">let</span> a3;
+    </span>
+  </code>
+</pre>
+```
+
 ## Options
 
 All options are **optional** and have **default values**.
@@ -141,7 +227,6 @@ All options are **optional** and have **default values**.
 type HighlightLinesOptions = {
   showLineNumbers?: boolean; // default is "false"
   lineContainerTagName?: "span" | "div"; // deprecated, always span
-  trimBlankLines?: boolean; // default is "false"
 };
 
 use(rehypeHighlightLines, HighlightLinesOptions);
@@ -159,7 +244,9 @@ use(rehypeHighlightLines, {
 });
 ```
 
-Now, all code blocks will become numbered. If you want to exclude a specific code block not to be numbered, use `noLineNumbers`.
+Now, all code blocks will become numbered.
+
+If you want to exclude a specific code block not to be numbered, use `noLineNumbers`.
 
 **\`\`\`[language] noLineNumbers {2}**
 
@@ -167,13 +254,25 @@ Now, all code blocks will become numbered. If you want to exclude a specific cod
 
 **\`\`\`noLineNumbers**
 
-Sometimes you may want to start the line numbering from a specific number. In that cases, use `showLineNumbers=[number]` in code blocks. For example, below, the code block's line numbering will start from number `8`.
+If you want to exclude a specific code block not to be numbered in HTML fragment (in `<pre>`) use `no-line-numbers` class. In that case, the directive could be with dash, or without, or camel cased.
+
+**`<code class="language-ts no-line-numbers">`**
+
+**`<code class="language-ts nolinenumbers">`**
+
+**`<code class="language-ts noLineNumbers">`**
+
+Sometimes you may want to start the line numbering from a specific number. In that cases, use `showLineNumbers=[number]` in code blocks. For example, below, the code block's line numbering will start from number `8`. 
 
 **\`\`\`[language] {2} showLineNumbers=8**
 
 **\`\`\`[language] showLineNumbers=8**
 
 **\`\`\`showLineNumbers=8**
+
+If you want to start the line numbering from a specific number in HTML fragment (in `<pre>`) use `data-start-numbering` attribute.
+
+**`<code class="..." data-start-numbering="8">`**
 
 #### `lineContainerTagName` (Deprecated)
 
@@ -188,39 +287,6 @@ use(rehypeHighlightLines, {
   lineContainerTagName: "div", // @deprecated, effectless, always "span"
 });
 ```
-
-#### `trimBlankLines`
-
-It is a **boolean** option. It is designed to delete one blank/empty line at the beginning and one at the end of the code block, if happened due to html parsing `<pre><code /></pre>`.
-
-By default, it is `false`.
-
-Let's assume you want to highlight `pre`, and `code` element in markdown (not code fence).
-
-```markdown
-Here is markdown content
-
-<pre><code class="language-javascript">
-console.log("rehype-highlight-code-lines");
-</code></pre>
-```
-
-For above markdown, the parsed result (for example via `rehype-parse` and `rehype-stringfy`) is going to contain empty/blank code lines due to nature of `pre` preserving whitespaces. In order to prevent having unintentionally blank lines, use the option `trimBlankLines`.
-
-```javascript
-use(rehypeHighlightLines, {
-  trimBlankLines: true,
-});
-```
-
-Actually, the trimming could have been the default behaviour. However, some developers may intentionally include empty lines at the beginning and at the end in code fences for specific reasons and may want to preserve them.
-````markdown
-```javascript
-
-console.log("rehype-highlight-code-lines");
-
-```
-````
 
 ### Examples:
 
