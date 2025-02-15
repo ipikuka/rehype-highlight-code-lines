@@ -32,7 +32,7 @@ const pluginLogTree = () => (tree: object) => {
 };
 
 describe("pre code shouldn't produce blank lines", () => {
-  it.only("trial", async () => {
+  it("trial", async () => {
     const input = dedent`
       \`\`\`javascript meta
       let a;

@@ -28,13 +28,13 @@ export type HighlightLinesOptions = {
    * will be removed in the next versions
    */
   lineContainerTagName?: "div" | "span";
-  trimBlankLines?: boolean;
+  keepOuterBlankLine?: boolean;
 };
 
 const DEFAULT_SETTINGS: HighlightLinesOptions = {
   showLineNumbers: false,
   lineContainerTagName: "span",
-  trimBlankLines: false,
+  keepOuterBlankLine: false,
 };
 
 type PartiallyRequiredHighlightLinesOptions = Prettify<
@@ -44,7 +44,7 @@ type PartiallyRequiredHighlightLinesOptions = Prettify<
 type GutterOptions = {
   directiveLineNumbering: boolean | number;
   directiveLineHighlighting: number[];
-  directiveLineTrimming: boolean;
+  directiveKeepOuterBlankLine: boolean;
 };
 
 // a simple util for our use case, like clsx package
@@ -244,54 +244,36 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
   /**
    *
-   * handle trimming blank line for the last text node
-   *
-   */
-  function handleTrimmingBlankLines(code: Element, directiveLineTrimming: boolean) {
-    if (!directiveLineTrimming) return;
-
-    const lastChild = code.children[code.children.length - 1];
-
-    if (lastChild.type === "text") {
-      if (/(\r?\n|\r)(\1)$/.test(lastChild.value)) {
-        lastChild.value = lastChild.value.replace(/(\r?\n|\r)(\1)$/, "$1");
-      }
-    }
-  }
-
-  /**
-   *
-   * extract the lines from HAST of code element
+   * finds the code lines from HAST of code element and costructs the lines
    * mutates the code
    *
    */
   function gutter(
     code: Element,
-    { directiveLineNumbering, directiveLineHighlighting, directiveLineTrimming }: GutterOptions,
+    {
+      directiveLineNumbering,
+      directiveLineHighlighting,
+      directiveKeepOuterBlankLine,
+    }: GutterOptions,
   ) {
-    hasFlatteningNeed(code) && flattenCodeTree(code); // mutates the code
+    hasFlatteningNeed(code) && flattenCodeTree(code);
 
-    handleFirstElementContent(code); // mutates the code
-
-    handleMultiLineComments(code); // mutates the code
-
-    handleTrimmingBlankLines(code, directiveLineTrimming);
+    handleFirstElementContent(code);
+    handleMultiLineComments(code);
 
     const replacement: ElementContent[] = [];
-
     let start = 0;
     let startTextRemainder = "";
     let lineNumber = 0;
 
     for (let index = 0; index < code.children.length; index++) {
       const child = code.children[index];
-
       if (child.type !== "text") continue;
 
       let textStart = 0;
-
       const matches = Array.from(child.value.matchAll(REGEX_LINE_BREAKS));
-      matches.forEach((match, iteration) => {
+
+      for (const [iteration, match] of matches.entries()) {
         // Nodes in this line. (current child (index) is exclusive)
         const line = code.children.slice(start, index);
 
@@ -303,25 +285,30 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
         // Append text from this text.
         if (match.index > textStart) {
-          const value = child.value.slice(textStart, match.index);
-          line.push({ type: "text", value });
+          line.push({ type: "text", value: child.value.slice(textStart, match.index) });
         }
 
         const isFirstIteration = index === 0 && iteration === 0;
+        const isLastIteration =
+          index === code.children.length - 1 && iteration === matches.length - 1;
 
-        if (isFirstIteration && directiveLineTrimming && line.length === 0) {
+        if (isFirstIteration && !directiveKeepOuterBlankLine && line.length === 0) {
           replacement.push({ type: "text", value: match[0] }); // eol
+        } else if (isLastIteration && !directiveKeepOuterBlankLine && line.length === 0) {
+          const lastReplacement = replacement[replacement.length - 1];
+          if (!(lastReplacement.type === "text" && lastReplacement.value === match[0]))
+            /* v8 ignore next */
+            replacement.push({ type: "text", value: match[0] }); // eol
         } else {
-          lineNumber += 1;
           replacement.push(
-            createLine(line, lineNumber, directiveLineNumbering, directiveLineHighlighting),
+            createLine(line, ++lineNumber, directiveLineNumbering, directiveLineHighlighting),
             { type: "text", value: match[0] }, // eol
           );
         }
 
         start = index + 1;
         textStart = match.index + match[0].length;
-      });
+      }
 
       // If we matched, make sure to not drop the text after the last line ending.
       if (start === index + 1) {
@@ -329,20 +316,26 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       }
     }
 
-    const line = code.children.slice(start);
+    const remainingLine = code.children.slice(start);
 
     // Prepend text from a partial matched earlier text.
     if (startTextRemainder) {
-      line.unshift({ type: "text", value: startTextRemainder });
-      startTextRemainder = "";
+      remainingLine.unshift({ type: "text", value: startTextRemainder });
     }
 
-    if (line.length > 0) {
-      directiveLineTrimming
-        ? replacement.push(...line)
-        : replacement.push(
-            createLine(line, ++lineNumber, directiveLineNumbering, directiveLineHighlighting),
-          );
+    if (remainingLine.length > 0) {
+      if (remainingLine[0].type === "text" && remainingLine[0].value.trim() === "") {
+        replacement.push(...remainingLine);
+      } else {
+        replacement.push(
+          createLine(
+            remainingLine,
+            ++lineNumber,
+            directiveLineNumbering,
+            directiveLineHighlighting,
+          ),
+        );
+      }
     }
 
     // Replace children with new array.
@@ -407,7 +400,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
         (language.startsWith("{") ||
           language.startsWith("showlinenumbers") ||
           language.startsWith("nolinenumbers") ||
-          language.startsWith("trimblanklines"))
+          language.startsWith("keepouterblankline"))
       ) {
         // add specifiers to meta
         meta = (language + " " + meta).trim();
@@ -419,7 +412,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
         code.properties.className = undefined;
       }
 
-      const keywords = ["showlinenumbers", "trimblanklines", "nolinenumbers"];
+      const keywords = ["showlinenumbers", "nolinenumbers", "keepouterblankline"];
 
       const classNames = code.properties.className
         ?.map((cls) => cls.toLowerCase().replaceAll("-", ""))
@@ -487,10 +480,10 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       /** the part of defining the directive for line trimming */
 
       // find the directive for trimming blank lines
-      const directiveLineTrimming =
-        settings.trimBlankLines ||
-        /trimblanklines/.test(meta) ||
-        Boolean(classNames?.includes("trimblanklines"));
+      const directiveKeepOuterBlankLine =
+        settings.keepOuterBlankLine ||
+        /keepouterblankline/.test(meta) ||
+        Boolean(classNames?.includes("keepouterblankline"));
 
       /** the part of cleaning of code properties */
 
@@ -505,8 +498,8 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       // if nothing to do for numbering, highlihting or trimming, just return;
       if (
         directiveLineNumbering === false &&
-        directiveLineHighlighting.length === 0 &&
-        directiveLineTrimming === false
+        directiveLineHighlighting.length === 0
+        // directiveKeepOuterBlankLine === false
       ) {
         return;
       }
@@ -515,7 +508,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       gutter(code, {
         directiveLineNumbering,
         directiveLineHighlighting,
-        directiveLineTrimming,
+        directiveKeepOuterBlankLine,
       });
     });
   };

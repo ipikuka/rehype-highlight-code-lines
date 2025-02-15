@@ -966,40 +966,41 @@ describe("reyhpe-highlight-code-lines, and line numbering (via settings)", () =>
   });
 
   // ******************************************
-  it("without language, with only trimBlankLines", async () => {
+  it("without language, with only keepOuterBlankLine", async () => {
     const input = dedent`
-      \`\`\`trimBlankLines
+      \`\`\`keepOuterBlankLine
+
       const a1=1;
       const a2=2;
       const a3=3;
+
       \`\`\`
     `;
 
     const html = String(await processFromMd(input));
 
+    // only keepOuterBlankLine is effectless
     expect(html).toMatchInlineSnapshot(`
-      "<pre><code><span class="code-line">const a1=1;</span>
-      <span class="code-line">const a2=2;</span>
-      <span class="code-line">const a3=3;</span>
+      "<pre><code>
+      const a1=1;
+      const a2=2;
+      const a3=3;
+
       </code></pre>"
     `);
 
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
-        <code>
-          <span class="code-line">const a1=1;</span>
-          <span class="code-line">const a2=2;</span>
-          <span class="code-line">const a3=3;</span>
-        </code>
+        <code>const a1=1; const a2=2; const a3=3;</code>
       </pre>
       "
     `);
   });
 
   // ******************************************
-  it("with language, with only trimBlankLines", async () => {
+  it("with language, with only keepOuterBlankLine", async () => {
     const input = dedent`
-      \`\`\`javascript trimBlankLines
+      \`\`\`javascript keepOuterBlankLine
       const a1=1;
       const a2=2;
       const a3=3;
@@ -1008,28 +1009,22 @@ describe("reyhpe-highlight-code-lines, and line numbering (via settings)", () =>
 
     const html = String(await processFromMd(input));
 
+    // only keepOuterBlankLine is effectless
     expect(html).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript"><span class="code-line"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;</span>
-      <span class="code-line"><span class="hljs-keyword">const</span> a2=<span class="hljs-number">2</span>;</span>
-      <span class="code-line"><span class="hljs-keyword">const</span> a3=<span class="hljs-number">3</span>;</span>
+      "<pre><code class="hljs language-javascript"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;
+      <span class="hljs-keyword">const</span> a2=<span class="hljs-number">2</span>;
+      <span class="hljs-keyword">const</span> a3=<span class="hljs-number">3</span>;
       </code></pre>"
     `);
 
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
-          <span class="code-line">
-            <span class="hljs-keyword">const</span> a1=
-            <span class="hljs-number">1</span>;
-          </span>
-          <span class="code-line">
-            <span class="hljs-keyword">const</span> a2=
-            <span class="hljs-number">2</span>;
-          </span>
-          <span class="code-line">
-            <span class="hljs-keyword">const</span> a3=
-            <span class="hljs-number">3</span>;
-          </span>
+          <span class="hljs-keyword">const</span> a1=
+          <span class="hljs-number">1</span>;<span class="hljs-keyword">const</span>{" "}
+          a2=<span class="hljs-number">2</span>;
+          <span class="hljs-keyword">const</span> a3=
+          <span class="hljs-number">3</span>;
         </code>
       </pre>
       "
@@ -1037,9 +1032,9 @@ describe("reyhpe-highlight-code-lines, and line numbering (via settings)", () =>
   });
 
   // ******************************************
-  it("with language, with trimBlankLines and with line numbering and line highlighting", async () => {
+  it("with language, with keepOuterBlankLine and with line numbering and line highlighting", async () => {
     const input = dedent`
-      \`\`\`javascript trimBlankLines showLineNumbers {2}
+      \`\`\`javascript keepOuterBlankLine showLineNumbers {2}
       const a1=1;
       const a2=2;
       const a3=3;
@@ -1104,7 +1099,9 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       </code></pre>"
     `);
 
-    const html2 = String(await processFromMd(input, { showLineNumbers: true }));
+    const html2 = String(
+      await processFromMd(input, { showLineNumbers: true, keepOuterBlankLine: true }),
+    );
 
     expect(html2).toMatchInlineSnapshot(`
       "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
@@ -1115,9 +1112,7 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       </code></pre>"
     `);
 
-    const html3 = String(
-      await processFromMd(input, { showLineNumbers: true, trimBlankLines: true }),
-    );
+    const html3 = String(await processFromMd(input, { showLineNumbers: true }));
 
     expect(html3).toMatchInlineSnapshot(`
       "<pre><code class="hljs language-javascript">
@@ -1155,7 +1150,9 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       </code></pre>"
     `);
 
-    const html2 = String(await processFromMd(input, { showLineNumbers: true }));
+    const html2 = String(
+      await processFromMd(input, { showLineNumbers: true, keepOuterBlankLine: true }),
+    );
 
     expect(html2).toMatchInlineSnapshot(`
       "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
@@ -1168,9 +1165,7 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       </code></pre>"
     `);
 
-    const html3 = String(
-      await processFromMd(input, { showLineNumbers: true, trimBlankLines: true }),
-    );
+    const html3 = String(await processFromMd(input, { showLineNumbers: true }));
 
     expect(html3).toMatchInlineSnapshot(`
       "<pre><code class="hljs language-javascript">
@@ -1186,7 +1181,7 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
   // ******************************************
   it("inside extra blank lines - 13", async () => {
     const input = dedent`
-      \`\`\`javascript trimBlankLines
+      \`\`\`javascript keepOuterBlankLine
 
       "use strict";
 
@@ -1197,21 +1192,24 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
 
     const html1 = String(await processFromMd(input));
 
+    // only keepOuterBlankLine is effectless
     expect(html1).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript">
-      <span class="code-line"><span class="hljs-meta">"use strict"</span>;</span>
-      <span class="code-line"></span>
-      <span class="code-line"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      "<pre><code class="hljs language-javascript"><span class="hljs-meta">
+      "use strict"</span>;
+
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);
+
       </code></pre>"
     `);
 
     const html2 = String(await processFromMd(input, { showLineNumbers: true }));
 
     expect(html2).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript">
-      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-meta">"use strict"</span>;</span>
-      <span class="code-line numbered-code-line" data-line-number="2"></span>
-      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-meta">"use strict"</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="3"></span>
+      <span class="code-line numbered-code-line" data-line-number="4"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      <span class="code-line numbered-code-line" data-line-number="5"></span>
       </code></pre>"
     `);
   });
@@ -1239,7 +1237,9 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       </code></pre>"
     `);
 
-    const html2 = String(await processFromMd(input, { showLineNumbers: true }));
+    const html2 = String(
+      await processFromMd(input, { showLineNumbers: true, keepOuterBlankLine: true }),
+    );
 
     expect(html2).toMatchInlineSnapshot(`
       "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
@@ -1250,9 +1250,7 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       </code></pre>"
     `);
 
-    const html3 = String(
-      await processFromMd(input, { showLineNumbers: true, trimBlankLines: true }),
-    );
+    const html3 = String(await processFromMd(input, { showLineNumbers: true }));
 
     expect(html3).toMatchInlineSnapshot(`
       "<pre><code class="hljs language-javascript">
@@ -1290,7 +1288,9 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       </code></pre>"
     `);
 
-    const html2 = String(await processFromMd(input, { showLineNumbers: true }));
+    const html2 = String(
+      await processFromMd(input, { showLineNumbers: true, keepOuterBlankLine: true }),
+    );
 
     expect(html2).toMatchInlineSnapshot(`
       "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
@@ -1303,9 +1303,7 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       </code></pre>"
     `);
 
-    const html3 = String(
-      await processFromMd(input, { showLineNumbers: true, trimBlankLines: true }),
-    );
+    const html3 = String(await processFromMd(input, { showLineNumbers: true }));
 
     expect(html3).toMatchInlineSnapshot(`
       "<pre><code class="hljs language-javascript">
@@ -1321,7 +1319,7 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
   // ******************************************
   it("inside extra blank lines - 23", async () => {
     const input = dedent`
-      \`\`\`javascript trimBlankLines
+      \`\`\`javascript keepOuterBlankLine
 
       console.log("xxx");
 
@@ -1332,21 +1330,24 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
 
     const html1 = String(await processFromMd(input));
 
+    // only keepOuterBlankLine is effectless
     expect(html1).toMatchInlineSnapshot(`
       "<pre><code class="hljs language-javascript">
-      <span class="code-line"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
-      <span class="code-line"></span>
-      <span class="code-line"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;</span>
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);
+
+      <span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;
+
       </code></pre>"
     `);
 
     const html2 = String(await processFromMd(input, { showLineNumbers: true }));
 
     expect(html2).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript">
-      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
-      <span class="code-line numbered-code-line" data-line-number="2"></span>
-      <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;</span>
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      <span class="code-line numbered-code-line" data-line-number="3"></span>
+      <span class="code-line numbered-code-line" data-line-number="4"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;</span>
+      <span class="code-line numbered-code-line" data-line-number="5"></span>
       </code></pre>"
     `);
   });
@@ -1376,7 +1377,9 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       </code></pre>"
     `);
 
-    const html2 = String(await processFromMd(input, { showLineNumbers: true }));
+    const html2 = String(
+      await processFromMd(input, { showLineNumbers: true, keepOuterBlankLine: true }),
+    );
 
     expect(html2).toMatchInlineSnapshot(`
       "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
@@ -1388,9 +1391,7 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       </code></pre>"
     `);
 
-    const html3 = String(
-      await processFromMd(input, { showLineNumbers: true, trimBlankLines: true }),
-    );
+    const html3 = String(await processFromMd(input, { showLineNumbers: true }));
 
     expect(html3).toMatchInlineSnapshot(`
       "<pre><code class="hljs language-javascript">
@@ -1433,7 +1434,9 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       </code></pre>"
     `);
 
-    const html2 = String(await processFromMd(input, { showLineNumbers: true }));
+    const html2 = String(
+      await processFromMd(input, { showLineNumbers: true, keepOuterBlankLine: true }),
+    );
 
     expect(html2).toMatchInlineSnapshot(`
       "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
@@ -1448,9 +1451,7 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       </code></pre>"
     `);
 
-    const html3 = String(
-      await processFromMd(input, { showLineNumbers: true, trimBlankLines: true }),
-    );
+    const html3 = String(await processFromMd(input, { showLineNumbers: true }));
 
     expect(html3).toMatchInlineSnapshot(`
       "<pre><code class="hljs language-javascript">

@@ -48,7 +48,7 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) "
 
       <h2>heading</h2>
 
-      <pre><code class="language-javascript showLineNumbers trimBlankLines">
+      <pre><code class="language-javascript showLineNumbers">
       var name = "World";
       </code></pre>
     `;
@@ -77,7 +77,7 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) "
     `);
   });
 
-  it("reyhpe-raw is used before plugins", async () => {
+  it("reyhpe-raw is used after plugins", async () => {
     const input = dedent`
       Hello World
 
@@ -147,6 +147,31 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) 2
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
+          <span class="code-line numbered-code-line" data-line-number="1">
+            <span class="hljs-keyword">let</span> name ={" "}
+            <span class="hljs-string">"ipikuka"</span>;
+          </span>
+        </code>
+      </pre>
+      "
+    `);
+  });
+
+  it("should highlight, and add numbering (via settings), and keepOuterBlankLine", async () => {
+    const input = dedent`
+      <pre><code class="language-javascript">
+      let name = "ipikuka";
+      </code></pre>
+    `;
+
+    const html = String(
+      await processRawFirst(input, { showLineNumbers: true, keepOuterBlankLine: true }),
+    );
+
+    // TODO: the first blank line ?
+    expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
+      "<pre>
+        <code class="hljs language-javascript">
           <span class="code-line numbered-code-line" data-line-number="1"></span>
           <span class="code-line numbered-code-line" data-line-number="2">
             <span class="hljs-keyword">let</span> name ={" "}
@@ -158,31 +183,7 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) 2
     `);
   });
 
-  it("should highlight, and add numbering (via settings), trim blank lines", async () => {
-    const input = dedent`
-      <pre><code class="language-javascript">
-      let name = "ipikuka";
-      </code></pre>
-    `;
-
-    const html = String(
-      await processRawFirst(input, { showLineNumbers: true, trimBlankLines: true }),
-    );
-
-    expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
-      "<pre>
-        <code class="hljs language-javascript">
-          <span class="code-line numbered-code-line" data-line-number="1">
-            <span class="hljs-keyword">let</span> name ={" "}
-            <span class="hljs-string">"ipikuka"</span>;
-          </span>
-        </code>
-      </pre>
-      "
-    `);
-  });
-
-  it("should highlight (only), and no numbering (while numbering via settings) 1", async () => {
+  it("should highlight (only), and no numbering (while numbering via settings)", async () => {
     const input = dedent`
       <pre><code class="language-javascript nolinenumbers">
       let name = "ipikuka";
@@ -202,7 +203,7 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) 2
     `);
   });
 
-  it("should highlight (only), and no numbering (while numbering via settings) 2", async () => {
+  it("should highlight (only), and no numbering with dash (while numbering via settings)", async () => {
     const input = dedent`
       <pre><code class="language-javascript no-line-numbers">
       let name = "ipikuka";
@@ -222,7 +223,7 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) 2
     `);
   });
 
-  it("should highlight (only), and no numbering (while numbering via settings) 3", async () => {
+  it("should highlight (only), and no numbering camelcase (while numbering via settings)", async () => {
     const input = dedent`
       <pre><code class="language-javascript noLineNumbers">
       let name = "ipikuka";
@@ -249,8 +250,75 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) 2
       </code></pre>
     `;
 
-    const html = String(await processRawFirst(input, { showLineNumbers: true }));
+    const html = String(await processRawFirst(input));
 
+    expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
+      "<pre>
+        <code class="hljs language-javascript">
+          <span class="code-line numbered-code-line" data-line-number="1">
+            <span class="hljs-keyword">let</span> name ={" "}
+            <span class="hljs-string">"ipikuka"</span>;
+          </span>
+        </code>
+      </pre>
+      "
+    `);
+  });
+
+  it("should highlight, and add numbering with dash", async () => {
+    const input = dedent`
+      <pre><code class="language-javascript show-line-numbers">
+      let name = "ipikuka";
+      </code></pre>
+    `;
+
+    const html = String(await processRawFirst(input));
+
+    expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
+      "<pre>
+        <code class="hljs language-javascript">
+          <span class="code-line numbered-code-line" data-line-number="1">
+            <span class="hljs-keyword">let</span> name ={" "}
+            <span class="hljs-string">"ipikuka"</span>;
+          </span>
+        </code>
+      </pre>
+      "
+    `);
+  });
+
+  it("should highlight, and add numbering with camelcase", async () => {
+    const input = dedent`
+      <pre><code class="language-javascript showLineNumbers">
+      let name = "ipikuka";
+      </code></pre>
+    `;
+
+    const html = String(await processRawFirst(input));
+
+    expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
+      "<pre>
+        <code class="hljs language-javascript">
+          <span class="code-line numbered-code-line" data-line-number="1">
+            <span class="hljs-keyword">let</span> name ={" "}
+            <span class="hljs-string">"ipikuka"</span>;
+          </span>
+        </code>
+      </pre>
+      "
+    `);
+  });
+
+  it("should highlight, and add numbering and keep outer blanks with dash", async () => {
+    const input = dedent`
+      <pre><code class="language-javascript show-line-numbers keep-outer-blank-line">
+      let name = "ipikuka";
+      </code></pre>
+    `;
+
+    const html = String(await processRawFirst(input));
+
+    // TODO: the first blank line ?
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
@@ -265,21 +333,21 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) 2
     `);
   });
 
-  it("should highlight, and add numbering and trim blank lines 1", async () => {
+  it("should highlight, and add numbering and keep outer blanks with small letter", async () => {
     const input = dedent`
-      <pre><code class="language-javascript showlinenumbers trimblanklines">
+      <pre><code class="language-javascript showlinenumbers keepouterblankline">
       let name = "ipikuka";
       </code></pre>
     `;
 
-    const html = String(
-      await processRawFirst(input, { showLineNumbers: true, trimBlankLines: true }),
-    );
+    const html = String(await processRawFirst(input));
 
+    // TODO: the first blank line ?
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
-          <span class="code-line numbered-code-line" data-line-number="1">
+          <span class="code-line numbered-code-line" data-line-number="1"></span>
+          <span class="code-line numbered-code-line" data-line-number="2">
             <span class="hljs-keyword">let</span> name ={" "}
             <span class="hljs-string">"ipikuka"</span>;
           </span>
@@ -289,21 +357,21 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) 2
     `);
   });
 
-  it("should highlight, and add numbering and trim blank lines 2", async () => {
+  it("should highlight, and add numbering and keep outer blanks  with camelcase", async () => {
     const input = dedent`
-      <pre><code class="language-javascript show-line-numbers trim-blank-lines">
+      <pre><code class="language-javascript showLineNumbers keepOuterBlankLine">
       let name = "ipikuka";
       </code></pre>
     `;
 
-    const html = String(
-      await processRawFirst(input, { showLineNumbers: true, trimBlankLines: true }),
-    );
+    const html = String(await processRawFirst(input));
 
+    // TODO: the first blank line ?
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
-          <span class="code-line numbered-code-line" data-line-number="1">
+          <span class="code-line numbered-code-line" data-line-number="1"></span>
+          <span class="code-line numbered-code-line" data-line-number="2">
             <span class="hljs-keyword">let</span> name ={" "}
             <span class="hljs-string">"ipikuka"</span>;
           </span>
@@ -313,33 +381,9 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) 2
     `);
   });
 
-  it("should highlight, and add numbering and trim blank lines 3", async () => {
+  it("should highlight, and add numbering and line highlighting", async () => {
     const input = dedent`
-      <pre><code class="language-javascript showLineNumbers trimBlankLines">
-      let name = "ipikuka";
-      </code></pre>
-    `;
-
-    const html = String(
-      await processRawFirst(input, { showLineNumbers: true, trimBlankLines: true }),
-    );
-
-    expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
-      "<pre>
-        <code class="hljs language-javascript">
-          <span class="code-line numbered-code-line" data-line-number="1">
-            <span class="hljs-keyword">let</span> name ={" "}
-            <span class="hljs-string">"ipikuka"</span>;
-          </span>
-        </code>
-      </pre>
-      "
-    `);
-  });
-
-  it("should highlight, and add numbering and trim blank lines 3", async () => {
-    const input = dedent`
-      <pre><code class="language-javascript showLineNumbers trimBlankLines" data-start-numbering=33 data-highlight-lines="3,4">
+      <pre><code class="language-javascript showLineNumbers" data-start-numbering=33 data-highlight-lines="3,4">
       "use strict"
       // comment-1
       let a;
@@ -348,9 +392,7 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) 2
       </code></pre>
     `;
 
-    const html = String(
-      await processRawFirst(input, { showLineNumbers: true, trimBlankLines: true }),
-    );
+    const html = String(await processRawFirst(input));
 
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
@@ -396,28 +438,6 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) 3
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code>
-          <span class="code-line numbered-code-line" data-line-number="1"></span>
-          <span class="code-line numbered-code-line" data-line-number="2">
-            let name = "ipikuka";
-          </span>
-        </code>
-      </pre>
-      "
-    `);
-  });
-
-  it("without code highlighting, numbering and trimming", async () => {
-    const input = dedent`
-      <pre><code class="show-line-numbers trim-blank-lines">
-      let name = "ipikuka";
-      </code></pre>
-    `;
-
-    const html = String(await processRawFirst(input));
-
-    expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
-      "<pre>
-        <code>
           <span class="code-line numbered-code-line" data-line-number="1">
             let name = "ipikuka";
           </span>
@@ -427,20 +447,19 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) 3
     `);
   });
 
-  it("without code highlighting, only trimming", async () => {
+  it("without code highlighting, only keepOuterBlankLine, it is effectless", async () => {
     const input = dedent`
-      <pre><code class="trim-blank-lines">
+      <pre><code class="keep-outer-blank-line">
       let name = "ipikuka";
       </code></pre>
     `;
 
     const html = String(await processRawFirst(input));
 
+    // TODO: the first blank line ?
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
-        <code>
-          <span class="code-line">let name = "ipikuka";</span>
-        </code>
+        <code>let name = "ipikuka";</code>
       </pre>
       "
     `);
@@ -448,7 +467,7 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) 3
 
   it("without code highlighting, only line highlighting", async () => {
     const input = dedent`
-      <pre><code data-highlight-lines="2">
+      <pre><code data-highlight-lines="1">
       let name = "ipikuka";
       </code></pre>
     `;
@@ -458,7 +477,6 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) 3
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code>
-          <span class="code-line"></span>
           <span class="code-line highlighted-code-line">let name = "ipikuka";</span>
         </code>
       </pre>
@@ -478,8 +496,7 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) 3
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code>
-          <span class="code-line numbered-code-line" data-line-number="2"></span>
-          <span class="code-line numbered-code-line" data-line-number="3">
+          <span class="code-line numbered-code-line" data-line-number="2">
             let name = "ipikuka";
           </span>
         </code>
@@ -500,8 +517,7 @@ describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) 3
     expect(await prettier.format(html, { parser: "mdx" })).toMatchInlineSnapshot(`
       "<pre>
         <code>
-          <span class="code-line numbered-code-line" data-line-number="0"></span>
-          <span class="code-line numbered-code-line" data-line-number="1">
+          <span class="code-line numbered-code-line" data-line-number="0">
             let name = "ipikuka";
           </span>
         </code>
