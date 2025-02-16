@@ -38,11 +38,11 @@ describe("pre code shouldn't produce blank lines", () => {
     const file2 = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
-      .use(plugin, { showLineNumbers: true, trimBlankLines: true })
+      .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
       .process(html);
 
-    expect(String(file2).prettifyPre()).toMatchInlineSnapshot(`
+    expect(String(file2).prettifyPreCode()).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
       <span class="code-line numbered-code-line" data-line-number="1">    <span class="hljs-keyword">let</span> a;</span>
@@ -79,11 +79,11 @@ describe("pre code shouldn't produce blank lines", () => {
     const file2 = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
-      .use(plugin, { showLineNumbers: true, trimBlankLines: true })
+      .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
       .process(html);
 
-    expect(String(file2).prettifyPre()).toMatchInlineSnapshot(`
+    expect(String(file2).prettifyPreCode()).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
       <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">let</span> a;</span>
@@ -116,13 +116,12 @@ describe("pre code shouldn't produce blank lines", () => {
     const file2 = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
-      .use(plugin, { showLineNumbers: true, trimBlankLines: true })
+      .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
       .process(html);
 
     expect(String(file2)).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript">
-      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">let</span> a;</span>
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">let</span> a;</span>
       </code></pre>"
     `);
   });
@@ -155,11 +154,11 @@ describe("pre code shouldn't produce blank lines", () => {
     const file2 = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
-      .use(plugin, { showLineNumbers: true, trimBlankLines: true })
+      .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
       .process(html);
 
-    expect(String(file2).prettifyPre()).toMatchInlineSnapshot(`
+    expect(String(file2).prettifyPreCode()).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
       <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-meta">    "use strict"</span>;</span>
@@ -196,11 +195,11 @@ describe("pre code shouldn't produce blank lines", () => {
     const file2 = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
-      .use(plugin, { showLineNumbers: true, trimBlankLines: true })
+      .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
       .process(html);
 
-    expect(String(file2).prettifyPre()).toMatchInlineSnapshot(`
+    expect(String(file2).prettifyPreCode()).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
       <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-meta">"use strict"</span>;</span>
@@ -233,13 +232,12 @@ describe("pre code shouldn't produce blank lines", () => {
     const file2 = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
-      .use(plugin, { showLineNumbers: true, trimBlankLines: true })
+      .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
       .process(html);
 
     expect(String(file2)).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript">
-      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-meta">"use strict"</span>;</span>
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-meta">"use strict"</span>;</span>
       </code></pre>"
     `);
   });
@@ -272,13 +270,12 @@ describe("pre code shouldn't produce blank lines", () => {
     const file2 = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
-      .use(plugin, { showLineNumbers: true, trimBlankLines: true })
+      .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
       .process(html);
 
     expect(String(file2)).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript">
-      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-comment">/**</span></span>
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-comment">/**</span></span>
       <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-comment"> * multiline comment</span></span>
       <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-comment"> */</span></span>
       </code></pre>"

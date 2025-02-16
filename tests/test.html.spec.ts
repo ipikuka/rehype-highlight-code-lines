@@ -61,7 +61,7 @@ describe("rehype-highlight-code-line, with html sources", () => {
 
     const file = String(await processFromHtml(html, { showLineNumbers: true }));
 
-    expect(String(file).prettifyPre()).toMatchInlineSnapshot(`
+    expect(String(file).prettifyPreCode()).toMatchInlineSnapshot(`
       "<pre>
         <code>
       <span class="code-line numbered-code-line" data-line-number="1">    text</span>
@@ -98,7 +98,7 @@ describe("rehype-highlight-code-line, with html sources", () => {
 
     const file = String(await processFromHtml(html, { showLineNumbers: true }));
 
-    expect(String(file).prettifyPre()).toMatchInlineSnapshot(`
+    expect(String(file).prettifyPreCode()).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
       <span class="code-line numbered-code-line" data-line-number="1">    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"a"</span>);</span>
@@ -134,7 +134,7 @@ describe("rehype-highlight-code-line, with html sources", () => {
 
     const file = String(await processFromHtml(html, { showLineNumbers: true }));
 
-    expect(String(file).prettifyPre()).toMatchInlineSnapshot(`
+    expect(String(file).prettifyPreCode()).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
       <span class="code-line numbered-code-line" data-line-number="1">    <span class="hljs-string">"use scrict"</span>;</span>
@@ -193,7 +193,7 @@ describe("rehype-highlight-code-line, with html sources", () => {
 
     const file = String(await processFromHtml(html, { showLineNumbers: true }));
 
-    expect(String(file).prettifyPre()).toMatchInlineSnapshot(`
+    expect(String(file).prettifyPreCode()).toMatchInlineSnapshot(`
       "<pre>
         <code class="hljs language-javascript">
       <span class="code-line numbered-code-line" data-line-number="1">    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"a"</span>);</span>

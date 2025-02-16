@@ -293,16 +293,17 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
           index === code.children.length - 1 && iteration === matches.length - 1;
 
         if (isFirstIteration && !directiveKeepOuterBlankLine && line.length === 0) {
-          replacement.push({ type: "text", value: match[0] }); // eol
+          // do nothing, intentionally
+          // this happens in code fence if there is extra blank line at the beginning or
+          // this happens in code html if there is eol right after <code> opening tag
+          // replacement.push({ type: "text", value: match[0] }); // cancelled
         } else if (isLastIteration && !directiveKeepOuterBlankLine && line.length === 0) {
-          const lastReplacement = replacement[replacement.length - 1];
-          if (!(lastReplacement.type === "text" && lastReplacement.value === match[0]))
-            /* v8 ignore next */
-            replacement.push({ type: "text", value: match[0] }); // eol
+          // do nothing, intentionally
+          // this happens always in code fence if there is extra blank line at the end
         } else {
           replacement.push(
             createLine(line, ++lineNumber, directiveLineNumbering, directiveLineHighlighting),
-            { type: "text", value: match[0] }, // eol
+            { type: "text", value: match[0] },
           );
         }
 

@@ -386,8 +386,7 @@ describe("reyhpe-highlight and reyhpe-highlight-code-lines together", () => {
     const expected = dedent`
       <h1>Hello World!</h1>
 
-      <pre><code class="hljs lang-js">
-      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;</span>
+      <pre><code class="hljs lang-js"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">var</span> name = <span class="hljs-string">"World"</span>;</span>
       <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"Hello, "</span> + name + <span class="hljs-string">"!"</span>)</span>
       </code></pre>
     `;
@@ -395,7 +394,7 @@ describe("reyhpe-highlight and reyhpe-highlight-code-lines together", () => {
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
-      .use(plugin, { showLineNumbers: true, trimBlankLines: true })
+      .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
       .process(expected);
 
@@ -452,15 +451,14 @@ describe("reyhpe-highlight and reyhpe-highlight-code-lines together", () => {
     const file = await unified()
       .use(rehypeParse, { fragment: true })
       .use(rehypeHighlight)
-      .use(plugin, { showLineNumbers: true, trimBlankLines: true })
+      .use(plugin, { showLineNumbers: true })
       .use(rehypeStringify)
       .process(input);
 
     expect(String(file)).toMatchInlineSnapshot(`
       "<h1>Hello World!</h1>
 
-      <pre><code class="hljs language-javascript">
-      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-meta">"use strict"</span>;</span>
+      <pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-meta">"use strict"</span>;</span>
       <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"very strict"</span>);</span>
       </code></pre>"
     `);

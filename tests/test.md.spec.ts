@@ -1115,8 +1115,7 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
     const html3 = String(await processFromMd(input, { showLineNumbers: true }));
 
     expect(html3).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript">
-      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-meta">"use strict"</span>;</span>
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-meta">"use strict"</span>;</span>
       <span class="code-line numbered-code-line" data-line-number="2"></span>
       <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
       </code></pre>"
@@ -1168,8 +1167,7 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
     const html3 = String(await processFromMd(input, { showLineNumbers: true }));
 
     expect(html3).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript">
-      <span class="code-line numbered-code-line" data-line-number="1"></span>
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
       <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-meta">"use strict"</span>;</span>
       <span class="code-line numbered-code-line" data-line-number="3"></span>
       <span class="code-line numbered-code-line" data-line-number="4"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
@@ -1253,8 +1251,7 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
     const html3 = String(await processFromMd(input, { showLineNumbers: true }));
 
     expect(html3).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript">
-      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
       <span class="code-line numbered-code-line" data-line-number="2"></span>
       <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;</span>
       </code></pre>"
@@ -1306,8 +1303,7 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
     const html3 = String(await processFromMd(input, { showLineNumbers: true }));
 
     expect(html3).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript">
-      <span class="code-line numbered-code-line" data-line-number="1"></span>
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
       <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;</span>
       <span class="code-line numbered-code-line" data-line-number="3"></span>
       <span class="code-line numbered-code-line" data-line-number="4"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"xxx"</span>);</span>
@@ -1394,8 +1390,7 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
     const html3 = String(await processFromMd(input, { showLineNumbers: true }));
 
     expect(html3).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript">
-      <span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-comment">// comment 1</span></span>
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-comment">// comment 1</span></span>
       <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-comment">// comment 2</span></span>
       <span class="code-line numbered-code-line" data-line-number="3"></span>
       <span class="code-line numbered-code-line" data-line-number="4"><span class="hljs-keyword">let</span> a = <span class="hljs-number">1</span>;</span>
@@ -1454,8 +1449,7 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
     const html3 = String(await processFromMd(input, { showLineNumbers: true }));
 
     expect(html3).toMatchInlineSnapshot(`
-      "<pre><code class="hljs language-javascript">
-      <span class="code-line numbered-code-line" data-line-number="1"></span>
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
       <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-comment">/**</span></span>
       <span class="code-line numbered-code-line" data-line-number="3"><span class="hljs-comment"> * comment1</span></span>
       <span class="code-line numbered-code-line" data-line-number="4"><span class="hljs-comment"> */</span></span>
@@ -1530,6 +1524,60 @@ describe("reyhpe-highlight-code-lines, with extra blank lines", () => {
       <span class="code-line numbered-code-line" data-line-number="14"><span class="hljs-comment"># Example usage:</span></span>
       <span class="code-line numbered-code-line" data-line-number="15">product = multiply_numbers(<span class="hljs-number">4</span>, <span class="hljs-number">7</span>)</span>
       <span class="code-line numbered-code-line" data-line-number="16"><span class="hljs-built_in">print</span>(<span class="hljs-string">"The product is:"</span>, product)</span>
+      </code></pre>"
+    `);
+  });
+
+  // ******************************************
+  it("inside extra blank lines - 31, double comments", async () => {
+    const input = dedent`
+      \`\`\`javascript
+      
+      async function highlight (code) {
+        "use server"
+      
+        console.log("next-mdx-remote-client");
+      }
+      
+      \`\`\`
+    `;
+
+    const html1 = String(await processFromMd(input));
+
+    expect(html1).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript">
+      <span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">highlight</span> (<span class="hljs-params">code</span>) {
+        <span class="hljs-string">"use server"</span>
+
+        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"next-mdx-remote-client"</span>);
+      }
+
+      </code></pre>"
+    `);
+
+    const html2 = String(
+      await processFromMd(input, { showLineNumbers: true, keepOuterBlankLine: true }),
+    );
+
+    expect(html2).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"></span>
+      <span class="code-line numbered-code-line" data-line-number="2"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">highlight</span> (<span class="hljs-params">code</span>) {</span>
+      <span class="code-line numbered-code-line" data-line-number="3">  <span class="hljs-string">"use server"</span></span>
+      <span class="code-line numbered-code-line" data-line-number="4"></span>
+      <span class="code-line numbered-code-line" data-line-number="5">  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"next-mdx-remote-client"</span>);</span>
+      <span class="code-line numbered-code-line" data-line-number="6">}</span>
+      <span class="code-line numbered-code-line" data-line-number="7"></span>
+      </code></pre>"
+    `);
+
+    const html3 = String(await processFromMd(input, { showLineNumbers: true }));
+
+    expect(html3).toMatchInlineSnapshot(`
+      "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">async</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">highlight</span> (<span class="hljs-params">code</span>) {</span>
+      <span class="code-line numbered-code-line" data-line-number="2">  <span class="hljs-string">"use server"</span></span>
+      <span class="code-line numbered-code-line" data-line-number="3"></span>
+      <span class="code-line numbered-code-line" data-line-number="4">  <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">"next-mdx-remote-client"</span>);</span>
+      <span class="code-line numbered-code-line" data-line-number="5">}</span>
       </code></pre>"
     `);
   });
