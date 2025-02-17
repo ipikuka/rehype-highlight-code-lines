@@ -14,6 +14,7 @@ declare module "hast" {
   interface Properties {
     dataStartNumbering?: string;
     dataHighlightLines?: string;
+    metastring?: string | null | undefined;
   }
 }
 
@@ -392,7 +393,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
       /** the part of correcting language and meta */
 
-      let meta = code.data?.meta?.toLowerCase().trim() ?? "";
+      let meta = (code.data?.meta || code.properties?.metastring || "").toLowerCase().trim();
 
       const language = getLanguage(code.properties.className);
 
@@ -403,31 +404,30 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
           language.startsWith("nolinenumbers") ||
           language.startsWith("keepouterblankline"))
       ) {
-        // add specifiers to meta
+        // add directives to meta
         meta = (language + " " + meta).trim();
 
-        // correct the code's meta
-        code.data && (code.data.meta = (language + " " + code.data.meta).trim());
-
-        // remove all classnames like hljs, lang-{1,3}, language-showLineNumbers, because of false positive
+        // remove classnames like hljs, lang-{1,3}, language-showLineNumbers, because of false positive
         code.properties.className = undefined;
       }
 
+      /** the part of getting directives from code.properties.className */
+
       const keywords = ["showlinenumbers", "nolinenumbers", "keepouterblankline"];
 
-      const classNames = code.properties.className
+      const directives = code.properties.className
         ?.map((cls) => cls.toLowerCase().replaceAll("-", ""))
         .filter((cls) => keywords.includes(cls));
 
-      /** the part of defining the directive for line numbering */
+      /** the part of defining the line numbering directive */
 
       const directiveNoLineNumbers =
-        meta.includes("nolinenumbers") || Boolean(classNames?.includes("nolinenumbers"));
+        meta.includes("nolinenumbers") || Boolean(directives?.includes("nolinenumbers"));
 
       const directiveShowLineNumbers =
         settings.showLineNumbers ||
         meta.includes("showlinenumbers") ||
-        Boolean(classNames?.includes("showlinenumbers"));
+        Boolean(directives?.includes("showlinenumbers"));
 
       let directiveLineNumbering: boolean | number = directiveNoLineNumbers
         ? false
@@ -443,9 +443,6 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
       // get the number where the line number starts, if exists
       const { dataStartNumbering } = code.properties;
-      if ("dataStartNumbering" in code.properties) {
-        code.properties["dataStartNumbering"] = undefined;
-      }
 
       if (
         !directiveNoLineNumbers &&
@@ -455,7 +452,7 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
         directiveLineNumbering = Number(dataStartNumbering);
       }
 
-      /** the part of defining the directive for line highlighting */
+      /** the part of defining the line highlighting directive */
 
       // find number range string within curly braces and parse it
       const directiveLineHighlighting: number[] = [];
@@ -469,39 +466,36 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
       // get number range string within properties and parse it
       const { dataHighlightLines } = code.properties;
-      if ("dataHighlightLines" in code.properties) {
-        code.properties["dataHighlightLines"] = undefined;
-      }
 
       if (dataHighlightLines) {
         const range = rangeParser(dataHighlightLines.replace(/\s/g, ""));
         directiveLineHighlighting.push(...range);
       }
 
-      /** the part of defining the directive for line trimming */
+      /** the part of defining the directive for outer blank lines */
 
       // find the directive for trimming blank lines
       const directiveKeepOuterBlankLine =
         settings.keepOuterBlankLine ||
         /keepouterblankline/.test(meta) ||
-        Boolean(classNames?.includes("keepouterblankline"));
+        Boolean(directives?.includes("keepouterblankline"));
 
-      /** the part of cleaning of code properties */
+      /** the part of cleaning the code properties */
 
-      code.properties.className = code.properties.className?.filter(
+      const classnamesFiltered = code.properties.className?.filter(
         (cls) => !keywords.includes(cls.toLowerCase().replaceAll("-", "")),
       );
 
-      if (isStringArray(code.properties.className) && code.properties.className.length === 0) {
-        code.properties.className = undefined;
-      }
+      code.properties.className = classnamesFiltered?.length ? classnamesFiltered : undefined;
 
-      // if nothing to do for numbering, highlihting or trimming, just return;
-      if (
-        directiveLineNumbering === false &&
-        directiveLineHighlighting.length === 0
-        // directiveKeepOuterBlankLine === false
-      ) {
+      ["dataStartNumbering", "dataHighlightLines", "metastring"].forEach((property) => {
+        if (property in code.properties) code.properties[property] = undefined;
+      });
+
+      /** the part of main logic */
+
+      // if nothing to do for line numbering or line highlihting, just return;
+      if (directiveLineNumbering === false && directiveLineHighlighting.length === 0) {
         return;
       }
 
