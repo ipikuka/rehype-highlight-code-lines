@@ -135,7 +135,7 @@ Without `rehype-highlight-code-lines`, the lines of code wouldn't be in a `span`
 
 ## Usage in HTML attributes
 
-**`rehype-highlight-code-lines`** runs on `<code>` elements with directives like `showLineNumbers` and range number in curly braces like `{2-4, 8}`. That directives can be passed as a word in markdown (` ```ts showLineNumbers {2-4, 8} `) or as a class and attribute in HTML (`<code class="language-ts show-line-numbers" data-highlight-lines="2-4, 8">`).
+**`rehype-highlight-code-lines`** runs on `<code>` elements with directives like `showLineNumbers` and range number in curly braces like `{2-4,8}`. That directives can be passed as a word in markdown (` ```ts showLineNumbers {2-4,8} `) or as a class and attribute in HTML (`<code class="language-ts show-line-numbers" data-highlight-lines="2-4,8">`).
 
 The inverse occurs when the option `showLineNumbers` is true. All `<code>` are processed and numbered. Then (` ```ts noLineNumbers `), or as a class (`<code class="language-ts no-line-numbers">`) can be used to prevent processing.
 

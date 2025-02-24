@@ -7,5 +7,6 @@
   "semi": true,
   "arrowParens": "always",
   "endOfLine": "lf",
-  "printWidth": 96
+  "printWidth": 96,
+  "objectWrap": "preserve"
 }
