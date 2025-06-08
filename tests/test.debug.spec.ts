@@ -111,7 +111,7 @@ describe("pre code shouldn't produce blank lines", () => {
     `);
   });
 
-  it("without plugin rehype-highlight-code-line", async () => {
+  it("without plugin rehype-highlight-code-line 2", async () => {
     const input = dedent`
       \`\`\`javascript showLineNumbers
       

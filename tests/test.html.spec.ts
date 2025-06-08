@@ -179,7 +179,7 @@ describe("rehype-highlight-code-line, with html sources", () => {
     `);
   });
 
-  it("should highlight and support line numbering for multiple `code`", async () => {
+  it("should highlight and support line numbering for multiple `code` 2", async () => {
     const html = dedent`
       <pre>
         <code class="language-javascript">

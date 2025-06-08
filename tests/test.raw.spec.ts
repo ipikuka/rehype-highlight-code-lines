@@ -5,7 +5,7 @@ import * as prettier from "prettier";
 import { processFromMd, processRawFirst, processRawAfter } from "./util/index";
 import "./util/test-utils";
 
-describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown) ", () => {
+describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown)", () => {
   it("should remove html nodes since there is no rehype-raw", async () => {
     const input = dedent`
       Hello World
