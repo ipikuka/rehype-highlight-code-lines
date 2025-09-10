@@ -226,6 +226,7 @@ All options are **optional** and have **default values**.
 ```typescript
 type HighlightLinesOptions = {
   showLineNumbers?: boolean; // default is "false"
+  keepOuterBlankLine?: boolean; // default is "false"
 };
 
 use(rehypeHighlightLines, HighlightLinesOptions);
@@ -272,6 +273,34 @@ Sometimes you may want to start the line numbering from a specific number. In th
 If you want to start the line numbering from a specific number in HTML fragment (in `<pre>`) use `data-start-numbering` attribute.
 
 **`<code class="..." data-start-numbering="8">`**
+
+#### `keepOuterBlankLine`
+
+It is a **boolean** option which is for all code blocks have an empty line container in the beginning and at the end. I added this option in case you want to have an empty code line on the edges for whatever reason.
+
+By default, it is `false`.
+
+```javascript
+use(rehypeHighlightLines, {
+  keepOuterBlankLine: true,
+});
+```
+
+Now, all code blocks will have one empty code line on each edge.
+
+If you want a specific code block has empty code line on the edges, use `keepOuterBlankLine`.
+
+**\`\`\`[language] keepOuterBlankLine**
+
+**\`\`\`keepOuterBlankLine**
+
+In HTML fragment use `keep-outer-blank-line` class. In that case, the directive could be with dash, or without, or camel cased.
+
+**`<code class="language-ts keep-outer-blank-line">`**
+
+**`<code class="language-ts keepouterblankline">`**
+
+**`<code class="language-ts keepOuterBlankLine">`**
 
 ### Examples:
 
