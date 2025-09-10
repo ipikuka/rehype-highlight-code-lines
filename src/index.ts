@@ -24,22 +24,16 @@ type ElementWithTextNode = Element & {
 
 export type HighlightLinesOptions = {
   showLineNumbers?: boolean;
-  /**
-   * @deprecated container tag name is always "span"
-   * will be removed in the next versions
-   */
-  lineContainerTagName?: "div" | "span";
   keepOuterBlankLine?: boolean;
 };
 
 const DEFAULT_SETTINGS: HighlightLinesOptions = {
   showLineNumbers: false,
-  lineContainerTagName: "span",
   keepOuterBlankLine: false,
 };
 
 type PartiallyRequiredHighlightLinesOptions = Prettify<
-  PartiallyRequired<HighlightLinesOptions, "showLineNumbers" | "lineContainerTagName">
+  PartiallyRequired<HighlightLinesOptions, "showLineNumbers">
 >;
 
 type GutterOptions = {

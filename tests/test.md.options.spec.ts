@@ -7,7 +7,7 @@ import "./util/test-utils";
 
 describe("reyhpe-highlight-code-lines, and line numbering (via settings)", () => {
   // ******************************************
-  it("with language, tag name is still 'span' despite the option", async () => {
+  it("with language, tag name is 'span'", async () => {
     const input = dedent`
       \`\`\`javascript {2} showLineNumbers
       const a1=1;
@@ -16,7 +16,7 @@ describe("reyhpe-highlight-code-lines, and line numbering (via settings)", () =>
       \`\`\`
     `;
 
-    const html = String(await processFromMd(input, { lineContainerTagName: "div" }));
+    const html = String(await processFromMd(input));
 
     expect(html).toMatchInlineSnapshot(`
       "<pre><code class="hljs language-javascript"><span class="code-line numbered-code-line" data-line-number="1"><span class="hljs-keyword">const</span> a1=<span class="hljs-number">1</span>;</span>

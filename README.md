@@ -100,7 +100,7 @@ async function main() {
 }
 ```
 
-Now, running `node example.js` you will see that each line of code is wrapped in a `span`, which has appropriate class names (`code-line`, `numbered-code-line`, `highlighted-code-line`)  and line numbering attribute `data-line-number`.
+Now, running `node example.js` you will see that each line of code is wrapped in a **`span`**, which has appropriate class names (`code-line`, `numbered-code-line`, `highlighted-code-line`)  and line numbering attribute `data-line-number`.
 
 ```html
 <pre>
@@ -200,7 +200,7 @@ async function main() {
 }
 ```
 
-Now, running `node example.js` you will see that each line of code is wrapped in a `span`, which has appropriate class names (`code-line`, `numbered-code-line`, `highlighted-code-line`)  and line numbering attribute `data-line-number`.
+Now, running `node example.js` you will see that each line of code is wrapped in a **`span`**, which has appropriate class names (`code-line`, `numbered-code-line`, `highlighted-code-line`)  and line numbering attribute `data-line-number`.
 
 ```html
 <pre>
@@ -226,7 +226,6 @@ All options are **optional** and have **default values**.
 ```typescript
 type HighlightLinesOptions = {
   showLineNumbers?: boolean; // default is "false"
-  lineContainerTagName?: "span" | "div"; // deprecated, always span
 };
 
 use(rehypeHighlightLines, HighlightLinesOptions);
@@ -273,20 +272,6 @@ Sometimes you may want to start the line numbering from a specific number. In th
 If you want to start the line numbering from a specific number in HTML fragment (in `<pre>`) use `data-start-numbering` attribute.
 
 **`<code class="..." data-start-numbering="8">`**
-
-#### `lineContainerTagName` (Deprecated)
-
-**It is marked as `@deprecated` and will be removed in the next versions.**
-
-It was a **union** option which was **"div" | "span"** for providing custom HTML tag name for code lines.
-
-By default, it is `span` which is **inline** level container. If you set it as `div`, the container will still be `span` after deprecation.
-
-```javascript
-use(rehypeHighlightLines, {
-  lineContainerTagName: "div", // @deprecated, effectless, always "span"
-});
-```
 
 ### Examples:
 
