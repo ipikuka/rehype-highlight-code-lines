@@ -16,15 +16,15 @@ This package is a **[unified][unified]** (**[rehype][rehype]**) plugin that **wr
 
 ## When should I use this?
 
-The `rehype-highlight-code-lines`  is ideal for adding line numbers to code blocks and highlighting specific lines.
+**`rehype-highlight-code-lines`** is ideal for adding line numbers to code blocks and highlighting specific lines.
 
-**The `rehype-highlight-code-lines` is NOT code highlighter and does NOT provide code highlighting!** You can use a code highlighter for example **[rehype-highlight][rehype-highlight]** to highlight the code, then use the `rehype-highlight-code-lines` **after**. 
+**`rehype-highlight-code-lines`** is **NOT** code highlighter and **does NOT** provide code highlighting! You can use a code highlighter for example **[rehype-highlight][rehype-highlight]** to highlight the code, then use the `rehype-highlight-code-lines` **after**.
 
 > [!IMPORTANT]
-> If the code highlighter already provides numbering and highlighting code lines, don't use `rehype-highlight-code-lines`!
+> If your code highlighter already provides numbering and highlighting code lines, don't use **`rehype-highlight-code-lines`**!
 > \
 > \
-> You can use `rehype-highlight-code-lines` even without a code highlighter.
+> You can use **`rehype-highlight-code-lines`** even without a code highlighter.
 
 ## Installation
 
@@ -119,7 +119,7 @@ Now, running `node example.js` you will see that each line of code is wrapped in
 </pre>
 ```
 
-Without `rehype-highlight-code-lines`, the lines of code wouldn't be in a `span`.
+Without **`rehype-highlight-code-lines`**, the lines of code wouldn't be in a `span`.
 
 ```html
 <pre>
