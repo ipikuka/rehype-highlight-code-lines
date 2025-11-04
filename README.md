@@ -26,7 +26,7 @@ This package is a **[unified][unified]** (**[rehype][rehype]**) plugin that **wr
 
 **`rehype-highlight-code-lines`** is ideal for adding line numbers to code blocks and highlighting specific lines.
 
-**`rehype-highlight-code-lines`** is **NOT** code highlighter and **does NOT** provide code highlighting! You can use a code highlighter for example **[rehype-highlight][rehype-highlight]** to highlight the code, then use the `rehype-highlight-code-lines` **after**.
+**`rehype-highlight-code-lines`** is **NOT** code highlighter and **does NOT** provide code highlighting! You can use a code highlighter for example **[rehype-highlight][rehype-highlight]** to highlight the code, then use **`rehype-highlight-code-lines`** **after**.
 
 > [!IMPORTANT]
 > If your code highlighter already provides numbering and highlighting code lines, don't use **`rehype-highlight-code-lines`**!
@@ -328,8 +328,8 @@ use(rehypeHighlightLines, {
 ![markdown code block result](https://github.com/rehypejs/rehype-highlight/assets/30029208/908449d6-8028-4ecd-8536-3e747c725da7)
 
 **Here you can find some demo applications below which the `rehype-highlight` and `rehype-highlight-code-lines` are used together:**
-+ [demo blog application](https://next-mdx-remote-client-in-app-router.vercel.app/) using `next-mdx-remote-client` within `Next.js app router`
-+ [demo blog application](https://next-mdx-remote-client-in-pages-router.vercel.app/) using `next-mdx-remote-client` within `Next.js pages router`
++ [demo blog application](https://nmrc-in-app-router.vercel.app) using `next-mdx-remote-client` within `Next.js app router`
++ [demo blog application](https://nmrc-in-pages-router.vercel.app) using `next-mdx-remote-client` within `Next.js pages router`
 
 ## Styling
 
