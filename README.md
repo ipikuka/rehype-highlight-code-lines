@@ -1,3 +1,11 @@
+### [Become a sponsor](https://github.com/sponsors/ipikuka) 🚀
+
+If you find **`rehype-highlight-code-lines`** useful in your projects, consider supporting my work.  
+Your sponsorship means a lot 💖
+
+Be the **first sponsor** and get featured here and on [my sponsor wall](https://github.com/sponsors/ipikuka).  
+Thank you for supporting open source! 🙌
+
 # rehype-highlight-code-lines
 
 [![npm version][badge-npm-version]][url-npm-package]
@@ -414,7 +422,7 @@ This plugin works with `rehype-parse` version 1+, `rehype-stringify` version 1+,
 
 ## Security
 
-Use of `rehype-highlight-code-lines` involves rehype (hast), but doesn't lead to cross-site scripting (XSS) attacks.
+Use of **`rehype-highlight-code-lines`** involves rehype (hast), but doesn't lead to cross-site scripting (XSS) attacks.
 
 ## My Plugins
 
