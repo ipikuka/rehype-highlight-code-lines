@@ -120,8 +120,8 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       if (elementContent.type === "comment" || elementContent.type === "text") {
         newTree.push(elementContent);
       } else {
+        /* v8 ignore next -- @preserve */
         // @ts-expect-error className is different from other key of properties, and expected to be an array or undefined
-        // /* v8 ignore next */
         const classNames = className.concat(elementContent.properties.className || []);
 
         if (
@@ -230,6 +230,8 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
 
     const match = REGEX_LINE_BREAKS_IN_THE_BEGINNING.exec(textNode.value);
 
+    // classic V8 coverage false negative
+    /* v8 ignore next -- @preserve */
     if (match) {
       code.children.unshift({ type: "text", value: match[0] });
 
@@ -377,10 +379,10 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       }
 
       // for type narrowing
+      /* v8 ignore if -- @preserve */
       if (
         !isStringArray(code.properties.className) &&
         code.properties.className !== undefined
-        /* v8 ignore next 3 */
       ) {
         return;
       }
