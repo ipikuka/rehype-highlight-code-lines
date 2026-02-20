@@ -298,8 +298,10 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
           // do nothing, intentionally
           // this happens always in code fence if there is extra blank line at the end
         } else {
+          lineNumber++;
+
           replacement.push(
-            createLine(line, ++lineNumber, directiveLineNumbering, directiveLineHighlighting),
+            createLine(line, lineNumber, directiveLineNumbering, directiveLineHighlighting),
             { type: "text", value: match[0] },
           );
         }
@@ -325,10 +327,12 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
       if (remainingLine[0].type === "text" && remainingLine[0].value.trim() === "") {
         replacement.push(...remainingLine);
       } else {
+        lineNumber++;
+
         replacement.push(
           createLine(
             remainingLine,
-            ++lineNumber,
+            lineNumber,
             directiveLineNumbering,
             directiveLineHighlighting,
           ),
