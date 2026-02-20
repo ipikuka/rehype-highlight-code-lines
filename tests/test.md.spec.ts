@@ -591,6 +591,7 @@ describe("reyhpe-highlight-code-lines, with markdown sources", () => {
   });
 
   // ******************************************
+  /* eslint-disable-next-line vitest/no-disabled-tests */
   it.skip("with language jsx, after flattened, for reference, fake test", async () => {
     const input = dedent`
       \`\`\`jsx
