@@ -17,7 +17,7 @@
     "format": "npm run prettier && npm run lint",
     "prettier": "prettier --write .",
     "lint": "eslint .",
-    "test": "vitest --watch=false",
+    "test": "vitest run",
     "test:watch": "vitest",
     "test:file1": "vitest test.md.spec.ts",
     "test:file2": "vitest test.html.spec.ts",
@@ -25,9 +25,9 @@
     "test:file4": "vitest from-rehype-highlight/test.rhcl2.spec.ts",
     "test:file5": "vitest test.raw.spec.ts",
     "test:file6": "vitest test.debug.spec.ts",
+    "test-coverage": "vitest run --coverage",
     "prepack": "npm run build",
-    "prepublishOnly": "npm run test && npm run format && npm run test-coverage",
-    "test-coverage": "vitest run --coverage"
+    "prepublishOnly": "npm run format && npm run test-coverage"
   },
   "files": [
     "dist/",
