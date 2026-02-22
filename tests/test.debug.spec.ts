@@ -7,36 +7,15 @@ import remarkRehype from "remark-rehype";
 import rehypeRaw from "rehype-raw";
 import rehypeStringify from "rehype-stringify";
 import rehypeHighlight from "rehype-highlight";
+import logTree from "unist-plugin-log-tree";
 import dedent from "dedent";
-
 import type { Plugin } from "unified";
 import type { Root } from "hast";
 import { visit, type VisitorResult } from "unist-util-visit";
 
 import plugin from "./../src";
-import "./util/test-utils";
 
-/**
- *
- * log the tree without position info as a rehype plugin
- *
- */
-const pluginLogTree: Plugin<void[], Root> = () => {
-  return (tree: Root): undefined => {
-    console.dir(
-      JSON.parse(
-        JSON.stringify(
-          tree,
-          function replacer(key, value) {
-            return key === "position" ? undefined : value;
-          },
-          2,
-        ),
-      ),
-      { depth: null },
-    );
-  };
-};
+import "./util/test-utils";
 
 /**
  *
@@ -89,7 +68,7 @@ describe("pre code shouldn't produce blank lines", () => {
       .use(remarkRehype, { allowDangerousHtml: true })
       .use(rehypeRaw)
       .use(rehypeHighlight)
-      .use(pluginLogTree)
+      .use(logTree({ label: "HAST, after rehypeHighlight" }))
       .use(rehypeStringify)
       .process(input);
 
@@ -139,7 +118,7 @@ describe("pre code shouldn't produce blank lines", () => {
       .use(pluginMeta)
       .use(rehypeRaw)
       .use(rehypeHighlight)
-      .use(pluginLogTree)
+      .use(logTree({ label: "HAST, after rehypeHighlight" }))
       .use(plugin)
       .use(rehypeStringify)
       .process(input);
