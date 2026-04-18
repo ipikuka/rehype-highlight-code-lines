@@ -7,7 +7,7 @@ import remarkRehype from "remark-rehype";
 import rehypeRaw from "rehype-raw";
 import rehypeStringify from "rehype-stringify";
 import rehypeHighlight from "rehype-highlight";
-import logTree from "unist-plugin-log-tree";
+import logTree from "unified-log-tree";
 import dedent from "dedent";
 import type { Plugin } from "unified";
 import type { Root } from "hast";

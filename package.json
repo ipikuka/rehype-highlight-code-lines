@@ -85,7 +85,7 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.0",
     "unified": "^11.0.5",
-    "unist-plugin-log-tree": "^1.0.1",
+    "unified-log-tree": "^1.1.5",
     "unist-util-remove-position": "^5.0.0",
     "vfile": "^6.0.3",
     "vitest": "^4.0.18"
