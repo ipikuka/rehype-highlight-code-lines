@@ -117,12 +117,18 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
     const newTree: ElementContent[] = [];
 
     for (const elementContent of code.children) {
-      if (elementContent.type === "comment" || elementContent.type === "text") {
+      if (
+        elementContent.type === "comment" ||
+        elementContent.type === "text" ||
+        elementContent.type === "raw"
+      ) {
         newTree.push(elementContent);
       } else {
         /* v8 ignore next -- @preserve */
-        // @ts-expect-error className is different from other key of properties, and expected to be an array or undefined
-        const classNames = className.concat(elementContent.properties.className || []);
+        const classNames = elementContent.properties.className
+          ? // @ts-expect-error className is expected to be an string array
+            className.concat(elementContent.properties.className)
+          : [...className];
 
         if (
           elementContent.children.length === 1 &&
