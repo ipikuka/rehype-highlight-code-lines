@@ -13,7 +13,7 @@ import type { Plugin } from "unified";
 import type { Root } from "hast";
 import { visit, type VisitorResult } from "unist-util-visit";
 
-import plugin from "./../src";
+import plugin from "./../src/index.js";
 
 import "./util/test-utils";
 

@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import dedent from "dedent";
 
 import "./util/test-utils";
-import { processFromHtml } from "./util";
+import { processFromHtml } from "./util/index.js";
 
 describe("rehype-highlight-code-line, with html sources", () => {
   it("should not highlight but support line numbering for text 1", async () => {

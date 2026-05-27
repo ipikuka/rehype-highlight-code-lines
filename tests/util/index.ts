@@ -1,3 +1,3 @@
-export { processFromMd } from "./from-md-source";
-export { processFromHtml } from "./from-html-source";
-export { processRawFirst, processRawAfter } from "./from-md-source-with-raw";
+export { processFromMd } from "./from-md-source.js";
+export { processFromHtml } from "./from-html-source.js";
+export { processRawFirst, processRawAfter } from "./from-md-source-with-raw.js";

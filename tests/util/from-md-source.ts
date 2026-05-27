@@ -6,7 +6,7 @@ import rehypeStringify from "rehype-stringify";
 import rehypeHighlight from "rehype-highlight";
 import type { VFileCompatible, VFile } from "vfile";
 
-import plugin, { type HighlightLinesOptions } from "../../src";
+import plugin, { type HighlightLinesOptions } from "../../src/index.js";
 
 const compilerCreator = (options?: HighlightLinesOptions) =>
   unified()

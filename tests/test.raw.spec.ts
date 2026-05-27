@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import dedent from "dedent";
 import * as prettier from "prettier";
 
-import { processFromMd, processRawFirst, processRawAfter } from "./util/index";
-import "./util/test-utils";
+import { processFromMd, processRawFirst, processRawAfter } from "./util/index.js";
+import "./util/test-utils.js";
 
 describe("reyhpe-highlight-code-lines with rehype-raw (html nodes in markdown)", () => {
   it("should remove html nodes since there is no rehype-raw", async () => {

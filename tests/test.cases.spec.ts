@@ -6,8 +6,8 @@ import rehypeHighlight from "rehype-highlight";
 import rehypeStringify from "rehype-stringify";
 import dedent from "dedent";
 
-import plugin from "../src";
-import "./util/test-utils";
+import plugin from "../src/index.js";
+import "./util/test-utils.js";
 
 describe("pre code shouldn't produce blank lines", () => {
   it("shouldn't add empty code lines - 1", async () => {
