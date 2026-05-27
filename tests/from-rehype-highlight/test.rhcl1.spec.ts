@@ -6,8 +6,8 @@ import rehypeStringify from "rehype-stringify";
 import rehypeHighlight from "rehype-highlight";
 import dedent from "dedent";
 
-import plugin from "../../src";
-import "../util/test-utils";
+import plugin from "../../src/index.js";
+import "../util/test-utils.js";
 
 // prettify <pre> putting new line right after opening tag
 String.prototype.prettifyPre = function () {

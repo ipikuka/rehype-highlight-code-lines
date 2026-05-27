@@ -6,7 +6,7 @@ import rehypeStringify from "rehype-stringify";
 import rehypeHighlight from "rehype-highlight";
 import dedent from "dedent";
 
-import "../util/test-utils";
+import "../util/test-utils.js";
 
 // all the test is taken from `rehype-highlight` for reference
 describe("reyhpe-highlight", () => {

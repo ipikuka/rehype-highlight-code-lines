@@ -73,6 +73,14 @@ function hasClassName(node: ElementContent | undefined, className: string): bool
   );
 }
 
+/* v8 ignore next -- @preserve */
+const normalize = (v: unknown): string[] => {
+  // @type-coverage:ignore-next-line
+  if (Array.isArray(v)) return v.map(String);
+  if (typeof v === "string") return [v];
+  return [];
+};
+
 // match all common types of line breaks
 const REGEX_LINE_BREAKS = /\r?\n|\r/g;
 const REGEX_LINE_BREAKS_IN_THE_BEGINNING = /^(\r?\n|\r)+/;
@@ -117,18 +125,10 @@ const plugin: Plugin<[HighlightLinesOptions?], Root> = (options) => {
     const newTree: ElementContent[] = [];
 
     for (const elementContent of code.children) {
-      if (
-        elementContent.type === "comment" ||
-        elementContent.type === "text" ||
-        elementContent.type === "raw"
-      ) {
+      if (elementContent.type !== "element") {
         newTree.push(elementContent);
       } else {
-        /* v8 ignore next -- @preserve */
-        const classNames = elementContent.properties.className
-          ? // @ts-expect-error className is expected to be an string array
-            className.concat(elementContent.properties.className)
-          : [...className];
+        const classNames = className.concat(normalize(elementContent.properties.className));
 
         if (
           elementContent.children.length === 1 &&

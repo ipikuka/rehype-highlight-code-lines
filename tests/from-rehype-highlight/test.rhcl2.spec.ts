@@ -6,8 +6,8 @@ import rehypeStringify from "rehype-stringify";
 import rehypeHighlight from "rehype-highlight";
 import dedent from "dedent";
 
-import plugin from "../../src";
-import "../util/test-utils";
+import plugin from "../../src/index.js";
+import "../util/test-utils.js";
 
 // all the test is taken from `rehype-highlight` for reference
 // added `rehype-highlight-code-lines` with options to see effects
